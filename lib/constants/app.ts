@@ -1,0 +1,2 @@
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "DAN DC";
+export const APP_HERO_TAGLINE = process.env.NEXT_PUBLIC_APP_HERO_TAGLINE || "Your one-stop shop for all things digital art and design.";
