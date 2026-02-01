@@ -9,10 +9,10 @@ export function Hero() {
 
       </div>
       <h1 className="sr-only">Supabase and Next.js Starter Template</h1>
-      <p className={cn("text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center", FONTS.notoSerif.className)}>
+      <p className={cn("text-3xl lg:text-4xl leading-tight! mx-auto max-w-xl text-center", FONTS.notoSerif.className)}>
         {APP_HERO_TAGLINE}
       </p>
-      <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
+      <div className="w-full p-px bg-linear-to-r from-transparent via-foreground/10 to-transparent my-8" />
     </div>
   );
 }
