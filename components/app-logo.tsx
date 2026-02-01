@@ -5,8 +5,8 @@ import { FONTS } from "@/lib/constants/fonts";
 
 export default function AppLogo({ className }: { className?: string }) {
     return (
-        <Link href="/" className={cn("flex items-center gap-2", FONTS.libreBaskerville.className, className)}>
-            <span className="text-xl font-bold">{APP_NAME}</span>
+        <Link href="/" className={cn("flex items-center gap-2", FONTS.hubotSans.className, className)}>
+            <span className="font-bold">{APP_NAME}</span>
         </Link>
     );
 }

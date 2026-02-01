@@ -9,9 +9,9 @@
     - [x] Connect Supabase Project (Env Vars)
     - [x] Run `schema.sql` migration in Supabase
     - [x] Verify Auth (Login/Signup) working locally
-- [ ] **Cleanup & Layout**
-    - [ ] Clean up default template (audit `app/page.tsx`, components)
-    - [ ] Setup global layout / theme (Fonts, Colors from Design System)
+- [x] **Cleanup & Layout**
+    - [x] Clean up default template (audit `app/page.tsx`, components)
+    - [x] Setup global layout / theme (Fonts, Colors from Design System)
 - [ ] **Feature: Commission Form**
     - [ ] Create simple "Request Commission" page
     - [ ] Integrate Database Insert (commissions table)
