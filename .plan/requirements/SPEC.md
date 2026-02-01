@@ -15,7 +15,8 @@ The core table storing commission requests and life-cycle data.
 | `updated_at` | `timestamptz` | `now()` | Last update timestamp |
 | `client_name` | `text` | - | Client's display name |
 | `client_email` | `text` | - | Contact email |
-| `commission_type` | `text` | - | Tier (e.g., "Bust", "Full Body") |
+| `commission_type` | `text` | - | Snapshot of Tier Name (e.g. "Bust") |
+| `tier_id` | `uuid` | - | Link to `commission_tiers` (optional) |
 | `details` | `text` | - | Request details/brief |
 | `reference_images` | `jsonb` | `[]` | Array of image URLs |
 | `is_commercial` | `boolean` | `false` | Commercial rights flag |
@@ -39,7 +40,34 @@ The core table storing commission requests and life-cycle data.
 | `external_id` | `text` | - | Xendit Invoice ID |
 | `payment_url` | `text` | - | Active Xendit Link |
 
-### 2. `portfolio_items` (CMS)
+### 2. `commission_tiers` (Inventory)
+Manageable list of offered services.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
+| `name` | `text` | - | Display Name (e.g. "Full Body") |
+| `description` | `text` | - | Short blurb for form |
+| `base_price` | `numeric` | 0 | Default Price (PHP) |
+| `currency` | `text` | `'PHP'` | Currency code |
+| `is_active` | `boolean` | `true` | Open/Closed status |
+| `slot_limit` | `integer` | 10 | Max active orders allowed |
+| `thumbnail_url` | `text` | - | Icon/Example image |
+| `created_at` | `timestamptz` | `now()` | - |
+
+### 3. `system_settings` (Config)
+Global configuration for fees and calculations. Single row enforced.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `integer` | 1 | Singleton ID |
+| `tax_rate` | `numeric` | 0.08 | Default BIR Tax Rate (8%) |
+| `xendit_fee_percent`| `numeric` | 0.0 | Xendit % Fee (e.g. 0.02 for 2%) |
+| `xendit_fee_fixed` | `numeric` | 0.0 | Xendit Fixed Fee (e.g. 15 PHP) |
+| `commercial_multiplier`| `numeric`| 2.0 | Multiplier for commercial works |
+| `updated_at` | `timestamptz` | `now()` | - |
+
+### 4. `portfolio_items` (CMS)
 Showcase of completed works.
 
 | Column | Type | Default | Description |
@@ -53,7 +81,7 @@ Showcase of completed works.
 | `published_at` | `timestamptz` | - | If null, it's a draft |
 | `created_at` | `timestamptz` | `now()` | - |
 
-### 3. `posts` (CMS)
+### 5. `posts` (CMS)
 Blog/Devlog updates.
 
 | Column | Type | Default | Description |
@@ -67,52 +95,24 @@ Blog/Devlog updates.
 | `is_published` | `boolean` | `false` | Draft status |
 | `published_at` | `timestamptz` | - | Public date |
 
-### 4. `activity_logs`
-Audit trail for changes.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
-| `commission_id` | `uuid` | - | Reference to Commission |
-| `actor` | `text` | `'SYSTEM'` | Who made the change? (Admin/Client/System) |
-| `action` | `text` | - | e.g. "STATUS_CHANGE", "PAYMENT_RECEIVED" |
-| `details` | `jsonb` | - | e.g. `{ "old": "PENDING", "new": "IN_PROGRESS" }` |
-| `created_at` | `timestamptz` | `now()` | - |
-
-### 5. `webhooks_log`
-(Retained from previous spec)
+### 6. `activity_logs` & `webhooks_log`
+(See existing schema)
 
 ---
 
 ## Enums
-**`commission_status`**
-- `PENDING`
-- `IN_PROGRESS`
-- `IN_REVISION`
-- `AWAITING_FINAL_PAYMENT`
-- `COMPLETED`
-- `EXPIRED`
-- `REFUNDED`
-- `REJECTED`
-
-**`payment_status_enum`**
-- `UNPAID`
-- `DEPOSIT_PAID`
-- `FULLY_PAID`
+(See existing enums)
 
 ## RLS Policies
 
 ### `commissions`
-*   **Admin:** `ALL` rights (SELECT, INSERT, UPDATE, DELETE).
-*   **Public:** `INSERT` only (Requests).
-*   **Public:** `SELECT` where `portal_slug` = input_slug (via Function or View to prevent table scanning, or rely on UUID unguessability for MVP).
-    *   *Constraint:* Clients cannot UPDATE anything.
-
-### `portfolio_items` & `posts`
 *   **Admin:** `ALL` rights.
-*   **Public:** `SELECT` where `published_at` is not null.
+*   **Public:** `INSERT` only.
 
-### `activity_logs` & `webhooks_log`
-*   **Admin:** `SELECT` only. 
-*   **System:** `INSERT` (via Service Key).
-*   **Public:** No access.
+### `commission_tiers`
+*   **Admin:** `ALL` rights.
+*   **Public:** `SELECT` where `is_active` = true.
+
+### `system_settings`
+*   **Admin:** `ALL` rights.
+*   **Public:** `SELECT` only (exposed for frontend calculations).
