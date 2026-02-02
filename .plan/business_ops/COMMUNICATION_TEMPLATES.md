@@ -12,9 +12,9 @@ Copy-paste these scripts to maintain professionalism and save time. Replace `[Br
 > **Project Summary**:
 > - Type: [e.g., Full Body, Cel Shaded]
 > - Character: [Character Name]
-> - Price: $[Amount] USD
+> - Price: ₱[Amount] PHP
 >
-> I have sent an invoice to your PayPal email ([Email]). Please note that my workflow starts once the [100% / 50%] payment is received.
+> I have sent an invoice to your email ([Email]) via Xendit. Please note that my workflow starts once the [100% / 50%] payment is received.
 >
 > You can review the Terms of Service here: [Link to TOS]
 >

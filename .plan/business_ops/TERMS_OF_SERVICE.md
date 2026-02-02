@@ -5,12 +5,12 @@ By commissioning me, you acknowledge that you have read, understood, and agreed 
 ## 1. General Terms
 - **Acceptance**: I reserve the right to decline any commission request without providing a reason.
 - **Communication**: All correspondence should be conducted via email or the platform's messaging system. Please allow 24-48 hours for a response.
-- **Age Restriction**: You must be at least 18 years old to commission NSFW content (if applicable) or legally able to enter into a contract.
+- **Age Restriction**: You must be legally able to enter into a contract. I strictly do **NOT** accept NSFW commissions.
 
 ## 2. Payment & Refunds
-- **Currency**: All prices are in USD (processed via PayPal/Stripe) or PHP (via GCash/Bank Transfer for local clients).
+- **Currency**: Primary currency is **PHP**. Payments are processed securely via **Xendit** (accepts GCash, Maya, Credit/Debit Cards, and Bank Transfer).
 - **Payment Structure**:
-  - **Upfront**: 100% payment required for commissions under $100 / ₱5,000.
+  - **Upfront**: 100% payment required for commissions under ₱5,000.
   - **Split Payment**: 50% non-refundable deposit to start, remaining 50% before file delivery for larger projects.
 - **Refunds**:
   - **Before Start**: 100% refund if I have not started working on your commission.
@@ -43,7 +43,7 @@ By commissioning me, you acknowledge that you have read, understood, and agreed 
 ## 4. Revisions
 - **Sketch Phase**: Major changes to composition, pose, and elements are free.
 - **Final Phase**: Minor color adjustments are free.
-- **Excessive Revisions**: Any changes requested after approved stages that require significant redrawing will incur an additional fee (min. $10 / ₱500 per revision).
+- **Excessive Revisions**: Any changes requested after approved stages that require significant redrawing will incur an additional fee (min. ₱500 per revision).
 
 ## 5. Deadlines & Rush Orders
 - **Standard Turnaround**: 1-3 weeks depending on complexity and queue.

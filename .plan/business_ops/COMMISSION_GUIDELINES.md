@@ -9,7 +9,7 @@ Please review these guidelines to understand my workflow and limitations before 
 - Fanart (Anime, Games, Movies)
 - Real People (Stylized/Anime style)
 - Kemonomimi (Humans with animal ears/tails)
-- Mild Gore / Artistic Nudity
+- Mild Gore
 
 ### ❌ I Will NOT Draw (Don'ts)
 - Mecha / Heavy Machinery (Detailed robots)
@@ -17,6 +17,7 @@ Please review these guidelines to understand my workflow and limitations before 
 - Excessive Gore / Violence
 - Political / Hate Art
 - Imitation of other specific artists' styles
+- **NSFW / Nudity / Sexual Content**
 
 *Note: I reserve the right to decline a commission if I feel I cannot do justice to the subject matter.*
 

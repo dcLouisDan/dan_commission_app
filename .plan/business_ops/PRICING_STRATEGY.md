@@ -38,7 +38,7 @@ The goal is to avoid underpricing yourself globally while still allowing friends
 ## The "Local Rate" Rule
 To prevent arbitrage (someone buying cheap locally and reselling globally):
 1.  **Limited Slots**: Only open 2-3 "Local Slots" per month.
-2.  **Payment Method**: Local rates MUST pay via GCash/Maya/BPI. USD rates via PayPal/Stripe.
+2.  **Payment Method**: All payments processed via **Xendit** (GCash/Maya/Cards). Local discount logic still applies based on residency.
 3.  **Strict IP**: Local rates are STRICTLY Personal Use Only.
 
 ## Quarterly Review
