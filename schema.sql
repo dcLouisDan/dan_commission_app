@@ -34,6 +34,8 @@ create table system_settings (
   xendit_fee_percent numeric default 0.0,
   xendit_fee_fixed numeric default 0.0,
   commercial_multiplier numeric default 2.0,
+  rush_multiplier numeric default 0.5,
+  extra_character_multiplier numeric default 0.75,
   updated_at timestamptz default now()
 );
 

@@ -78,6 +78,8 @@ Global configuration for fees and calculations. Single row enforced.
 | `xendit_fee_percent`| `numeric` | 0.0 | Xendit % Fee (e.g. 0.02 for 2%) |
 | `xendit_fee_fixed` | `numeric` | 0.0 | Xendit Fixed Fee (e.g. 15 PHP) |
 | `commercial_multiplier`| `numeric`| 2.0 | Multiplier for commercial works |
+| `rush_multiplier` | `numeric` | 0.5 | Multiplier for rush orders |
+| `extra_character_multiplier`| `numeric`| 0.75 | Multiplier for extra characters |
 | `updated_at` | `timestamptz` | `now()` | - |
 
 ### 5. `portfolio_items` (CMS)

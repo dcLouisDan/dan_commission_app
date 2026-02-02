@@ -77,10 +77,15 @@ create policy "Public can view active addons"
   using (is_active = true);
 
 -- ==========================================
--- NEWLY ADDED: Commission Tiers Matrix Pricing & Dual Currency
+-- NEWLY ADDED: Commission Tiers Matrix Pricing, Dual Currency, & Rush Multiplier
 -- ==========================================
 
--- 1. Add new matrix columns to commission_tiers
+-- 1. Add rush_multiplier to system_settings
+alter table system_settings 
+  add column if not exists rush_multiplier numeric default 0.5,
+  add column if not exists extra_character_multiplier numeric default 0.75;
+
+-- 2. Add new matrix columns to commission_tiers
 alter table commission_tiers 
   add column if not exists category text,
   add column if not exists variant text,

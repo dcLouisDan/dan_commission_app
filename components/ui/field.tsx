@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { FONTS } from "@/lib/constants/fonts"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
@@ -31,7 +32,8 @@ function FieldLegend({
       data-slot="field-legend"
       data-variant={variant}
       className={cn(
-        "mb-3 font-medium",
+        FONTS.hubotSans.className,
+        "mb-3 font-bold",
         "data-[variant=legend]:text-base",
         "data-[variant=label]:text-sm",
         className

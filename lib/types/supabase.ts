@@ -322,7 +322,9 @@ export type Database = {
       system_settings: {
         Row: {
           commercial_multiplier: number | null
+          extra_character_multiplier: number | null
           id: number
+          rush_multiplier: number | null
           tax_rate: number | null
           updated_at: string | null
           xendit_fee_fixed: number | null
@@ -330,7 +332,9 @@ export type Database = {
         }
         Insert: {
           commercial_multiplier?: number | null
+          extra_character_multiplier?: number | null
           id?: number
+          rush_multiplier?: number | null
           tax_rate?: number | null
           updated_at?: string | null
           xendit_fee_fixed?: number | null
@@ -338,7 +342,9 @@ export type Database = {
         }
         Update: {
           commercial_multiplier?: number | null
+          extra_character_multiplier?: number | null
           id?: number
+          rush_multiplier?: number | null
           tax_rate?: number | null
           updated_at?: string | null
           xendit_fee_fixed?: number | null
