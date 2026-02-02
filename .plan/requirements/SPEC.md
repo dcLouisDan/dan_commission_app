@@ -17,11 +17,13 @@ The core table storing commission requests and life-cycle data.
 | `client_email` | `text` | - | Contact email |
 | `commission_type` | `text` | - | Snapshot of Tier Name (e.g. "Bust") |
 | `tier_id` | `uuid` | - | Link to `commission_tiers` (optional) |
-| `details` | `text` | - | Request details/brief |
+| `form_data` | `jsonb` | `{}` | Full intake form responses (Socials, Character, Addons) |
 | `reference_images` | `jsonb` | `[]` | Array of image URLs |
 | `is_commercial` | `boolean` | `false` | Commercial rights flag |
-| `priority_level` | `text` | `'STANDARD'` | 'STANDARD', 'RUSH', 'VIP' |
+| `priority_level` | `priority_level_enum` | `'STANDARD'` | Priority status |
 | `internal_notes` | `text` | - | Private artist notes (hidden from client) |
+
+
 | **Financials** | | | |
 | `base_price` | `numeric` | - | Starting price |
 | `total_price` | `numeric` | - | Final agreed price |
@@ -40,22 +42,33 @@ The core table storing commission requests and life-cycle data.
 | `external_id` | `text` | - | Xendit Invoice ID |
 | `payment_url` | `text` | - | Active Xendit Link |
 
-### 2. `commission_tiers` (Inventory)
-Manageable list of offered services.
+### 2. `commission_tiers` (Inventory - Services)
+Manageable list of offered services (SKUs).
 
 | Column | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
-| `name` | `text` | - | Display Name (e.g. "Full Body") |
+| `category` | `text` | - | Style grouping (e.g. "Flat Color") |
+| `variant` | `text` | - | Scale/Size (e.g. "Headshot") |
+| `price_php` | `numeric` | 0 | Local Price |
+| `price_usd` | `numeric` | 0 | International Price |
 | `description` | `text` | - | Short blurb for form |
-| `base_price` | `numeric` | 0 | Default Price (PHP) |
-| `currency` | `text` | `'PHP'` | Currency code |
 | `is_active` | `boolean` | `true` | Open/Closed status |
 | `slot_limit` | `integer` | 10 | Max active orders allowed |
 | `thumbnail_url` | `text` | - | Icon/Example image |
-| `created_at` | `timestamptz` | `now()` | - |
 
-### 3. `system_settings` (Config)
+### 3. `commission_addons` (Inventory - Extras)
+Manageable list of add-ons.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
+| `title` | `text` | - | Display Name (e.g. "Complex bg") |
+| `description` | `text` | - | Details |
+| `price` | `numeric` | 0 | Price increase |
+| `is_active` | `boolean` | `true` | Show in form? |
+
+### 4. `system_settings` (Config)
 Global configuration for fees and calculations. Single row enforced.
 
 | Column | Type | Default | Description |
@@ -67,7 +80,7 @@ Global configuration for fees and calculations. Single row enforced.
 | `commercial_multiplier`| `numeric`| 2.0 | Multiplier for commercial works |
 | `updated_at` | `timestamptz` | `now()` | - |
 
-### 4. `portfolio_items` (CMS)
+### 5. `portfolio_items` (CMS)
 Showcase of completed works.
 
 | Column | Type | Default | Description |
@@ -81,7 +94,7 @@ Showcase of completed works.
 | `published_at` | `timestamptz` | - | If null, it's a draft |
 | `created_at` | `timestamptz` | `now()` | - |
 
-### 5. `posts` (CMS)
+### 6. `posts` (CMS)
 Blog/Devlog updates.
 
 | Column | Type | Default | Description |
@@ -95,12 +108,17 @@ Blog/Devlog updates.
 | `is_published` | `boolean` | `false` | Draft status |
 | `published_at` | `timestamptz` | - | Public date |
 
-### 6. `activity_logs` & `webhooks_log`
+### 7. `activity_logs` & `webhooks_log`
 (See existing schema)
 
 ---
 
 ## Enums
+**`priority_level_enum`**
+- `STANDARD`
+- `RUSH`
+- `VIP`
+
 (See existing enums)
 
 ## RLS Policies
@@ -109,10 +127,10 @@ Blog/Devlog updates.
 *   **Admin:** `ALL` rights.
 *   **Public:** `INSERT` only.
 
-### `commission_tiers`
+### `commission_tiers` & `commission_addons`
 *   **Admin:** `ALL` rights.
 *   **Public:** `SELECT` where `is_active` = true.
 
 ### `system_settings`
 *   **Admin:** `ALL` rights.
-*   **Public:** `SELECT` only (exposed for frontend calculations).
+*   **Public:** `SELECT` only.

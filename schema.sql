@@ -13,6 +13,12 @@ create type commission_status as enum (
   'REJECTED'
 );
 
+create type priority_level_enum as enum (
+  'STANDARD',
+  'RUSH',
+  'VIP'
+);
+
 create type payment_status_enum as enum (
   'UNPAID', 
   'DEPOSIT_PAID', 
@@ -32,22 +38,34 @@ create table system_settings (
 );
 
 -- Seed default settings
-insert into system_settings (id) values (1) on conflict do nothing;
+insert into system_settings (id) values (2) on conflict do nothing;
 
--- 2. Commission Tiers (Inventory)
+-- 2. Commission Tiers (Inventory - Services)
 create table commission_tiers (
   id uuid primary key default uuid_generate_v4(),
   created_at timestamptz default now(),
-  name text not null,
+  category text not null, -- Style (e.g. "Flat Color")
+  variant text not null, -- Scale (e.g. "Headshot")
+  price_php numeric not null default 0,
+  price_usd numeric not null default 0,
   description text,
-  base_price numeric default 0,
-  currency text default 'PHP',
   is_active boolean default true,
   slot_limit integer default 10,
-  thumbnail_url text
+  thumbnail_url text,
+  unique (category, variant)
 );
 
--- 3. Commissions Table
+-- 3. Commission Add-ons (Inventory - Extras)
+create table commission_addons (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz default now(),
+  title text not null,
+  description text,
+  price numeric default 0,
+  is_active boolean default true
+);
+
+-- 4. Commissions Table
 create table commissions (
   id uuid primary key default uuid_generate_v4(),
   created_at timestamptz default now(),
@@ -59,11 +77,11 @@ create table commissions (
   
   -- Commission Details
   commission_type text not null, -- Snapshot of tier name
-  tier_id uuid references commission_tiers(id) on delete set null, -- Optional link
-  details text,
+  tier_id uuid references commission_tiers(id) on delete set null,
+  form_data jsonb default '{}'::jsonb, -- Full Intake Data (Socials, Character, Selected Addons Snapshot)
   reference_images jsonb default '[]'::jsonb,
   is_commercial boolean default false,
-  priority_level text default 'STANDARD',
+  priority_level priority_level_enum default 'STANDARD',
   internal_notes text,
   
   -- Financials
@@ -89,7 +107,7 @@ create table commissions (
 
 create index idx_commissions_portal_slug on commissions(portal_slug);
 
--- 4. CMS: Portfolio & Posts
+-- 5. CMS: Portfolio & Posts
 create table portfolio_items (
   id uuid primary key default uuid_generate_v4(),
   created_at timestamptz default now(),
@@ -115,7 +133,7 @@ create table posts (
   published_at timestamptz
 );
 
--- 5. Audit Logs
+-- 6. Audit Logs
 create table activity_logs (
   id uuid primary key default uuid_generate_v4(),
   created_at timestamptz default now(),
@@ -138,6 +156,7 @@ create table webhooks_log (
 -- RLS
 alter table commissions enable row level security;
 alter table commission_tiers enable row level security;
+alter table commission_addons enable row level security;
 alter table system_settings enable row level security;
 alter table portfolio_items enable row level security;
 alter table posts enable row level security;
@@ -146,24 +165,16 @@ alter table webhooks_log enable row level security;
 
 -- Policies
 
--- Admin Access (Policies for Logs)
--- Ideally, we check for a specific admin UUID or role. 
--- For now, we deny public access by default since no public policies exist for these tables.
--- Admin usage will likely use the SERVICE_ROLE key (bypasses RLS) or a specific policy if using client-side auth.
-
--- Example: Allow Admin Read-Only on Logs (if using client-side admin auth)
--- create policy "Admins can view activity logs"
---   on activity_logs for select
---   using (auth.uid() = 'admin_uuid_here');
-
--- Policies
-
--- Public Read Tiers
+-- Public Read Tiers & Addons
 create policy "Public can view active tiers"
   on commission_tiers for select
   using (is_active = true);
 
--- Public Read Settings (for calculator)
+create policy "Public can view active addons"
+  on commission_addons for select
+  using (is_active = true);
+
+-- Public Read Settings
 create policy "Public can view settings"
   on system_settings for select
   using (true);
@@ -176,3 +187,8 @@ create policy "Public can view published portfolio"
 create policy "Public can view published posts"
   on posts for select
   using (is_published = true);
+
+-- Admin Access Logs (Example placeholder)
+-- create policy "Admins can view activity logs"
+--   on activity_logs for select
+--   using (auth.uid() = 'admin_uuid_here');
