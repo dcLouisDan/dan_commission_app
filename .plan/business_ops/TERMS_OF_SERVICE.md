@@ -6,6 +6,8 @@ By commissioning me, you acknowledge that you have read, understood, and agreed 
 - **Acceptance**: I reserve the right to decline any commission request without providing a reason.
 - **Communication**: All correspondence should be conducted via email or the platform's messaging system. Please allow 24-48 hours for a response.
 - **Age Restriction**: You must be legally able to enter into a contract. I strictly do **NOT** accept NSFW commissions.
+- **Medium & Subject**: I specialize in **Character Art**. All artwork is digital, hand-drawn using a pen tablet and professional drawing software.
+- **No Physical Items**: I only provide digital files; no physical paintings, prints, or items will be shipped.
 
 ## 2. Payment & Refunds
 - **Currency**: Primary currency is **PHP**. Payments are processed securely via **Xendit** (accepts GCash, Maya, Credit/Debit Cards, and Bank Transfer).
@@ -49,6 +51,6 @@ By commissioning me, you acknowledge that you have read, understood, and agreed 
 - **Standard Turnaround**: 1-3 weeks depending on complexity and queue.
 - **Rush Orders**: If you need the artwork by a specific date, a **Rush Fee (25-50% surcharge)** will apply to prioritize your slot.
 
-## 6. AI Generative Tools
-- I do **NOT** use AI generative tools (Midjourney, Stable Diffusion, etc.) in my workflow. All artwork is hand-drawn.
-- You are strictly prohibited from feeding my artwork into AI training models.
+## 6. Artistic Process & AI Policy
+- **Hand-Drawn**: Every piece is hand-drawn using a pen tablet. I do **NOT** use AI generative tools (Midjourney, Stable Diffusion, etc.) in any part of my workflow.
+- **Training Prohibition**: You are strictly prohibited from feeding my artwork into AI training models or using it for AI-related generation.

@@ -1,6 +1,6 @@
 # Commission Guidelines
 
-Please review these guidelines to understand my workflow and limitations before submitting a request.
+Please review these guidelines to understand my workflow and limitations before submitting a request. My primary specialization is **Character Art**.
 
 ## What I Will & Will Not Draw
 
