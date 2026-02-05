@@ -71,7 +71,7 @@ const formSchema = z.object({
     priority_level: z.enum(Constants.public.Enums.priority_level_enum),
     tier_id: z.string().min(1, "Tier is required"),
     addon_extra_characters: z.boolean(),
-    addon_extra_characters_count: z.number().min(1, "Extra characters count is required"),
+    addon_extra_characters_count: z.coerce.number<string>().optional(),
     addon_commercial: z.boolean(),
     rush_order: z.boolean(),
     intended_use: z.string().min(1, "Intended use is required"),
@@ -116,6 +116,8 @@ const formSchema = z.object({
     path: ["google_drive_folder"]
 })
 
+type FormInput = z.input<typeof formSchema>;
+type FormOutput = z.output<typeof formSchema>;
 
 const fieldPlaceholders: Record<keyof typeof formSchema.shape, string> = {
     // Identity & Contact
@@ -149,11 +151,12 @@ const fieldPlaceholders: Record<keyof typeof formSchema.shape, string> = {
     deposit_agreed: "By checking this box, you agree to pay the non-refundable deposit and that the work will begin after payment.",
 }
 
+
 export default function CommissionForm() {
     const { tierListOptions } = useTierList()
     const { systemSettings } = useSystemSettings()
     const { commissionAddons } = useCommissionAddons()
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm<FormInput, unknown, FormOutput>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             client_name: "",
@@ -164,7 +167,7 @@ export default function CommissionForm() {
             priority_level: "STANDARD",
             tier_id: "",
             addon_extra_characters: false,
-            addon_extra_characters_count: 0,
+            addon_extra_characters_count: "0",
             addon_commercial: false,
             rush_order: false,
             intended_use: "",
@@ -176,9 +179,9 @@ export default function CommissionForm() {
             character_setting: "",
             character_lighting: "",
             image_submit_option: IMAGE_SUBMIT_OPTIONS[0],
-            google_drive_folder: "",
+            google_drive_folder: undefined,
             direct_upload_images: [],
-            image_links: [""],
+            image_links: undefined,
             tos_agreed: false,
             deposit_agreed: false,
         }
@@ -227,7 +230,9 @@ export default function CommissionForm() {
         form.setValue("google_drive_folder", "")
     }
 
-    const canSubmit = form.formState.isDirty && !form.formState.isSubmitting && form.watch("tos_agreed") && form.watch("deposit_agreed")
+    console.log(form.formState.errors)
+
+    const canSubmit = form.formState.isValid && !form.formState.isSubmitting && form.watch("tos_agreed") && form.watch("deposit_agreed")
 
     return (
         <form id="commission-form" onSubmit={form.handleSubmit(handleSubmit)}>
@@ -308,7 +313,7 @@ export default function CommissionForm() {
                             name="tier_id"
                             control={form.control}
                             render={({ field, fieldState }) => (
-                                <Field orientation="responsive">
+                                <Field orientation="responsive" className="relative">
                                     <FieldContent>
                                         <FieldLabel>Commission Tier</FieldLabel>
                                         <FieldDescription>Choose the tier that best suits your needs.</FieldDescription>
@@ -316,7 +321,6 @@ export default function CommissionForm() {
                                     <BasicSelect
                                         options={tierListOptions}
                                         placeholder={fieldPlaceholders.tier_id}
-                                        disabled={fieldState.invalid}
                                         value={field.value}
                                         onValueChange={(value) => {
                                             form.setValue("tier_id", value)
@@ -325,7 +329,7 @@ export default function CommissionForm() {
                                         }}
                                         ariaInvalid={fieldState.invalid}
                                     />
-                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} className="absolute -bottom-3 right-0" />}
                                 </Field>
                             )}
                         />
@@ -394,13 +398,13 @@ export default function CommissionForm() {
                                         name="addon_extra_characters_count"
                                         control={form.control}
                                         render={({ field, fieldState }) => (
-                                            <Field orientation="responsive">
+                                            <Field orientation="responsive" className="relative">
                                                 <FieldContent>
                                                     <FieldLabel htmlFor="extra-character-checkbox">Number of extra characters</FieldLabel>
                                                     <FieldDescription>How many extra characters do you want to add to this commission?</FieldDescription>
                                                 </FieldContent>
-                                                <Input type="number" min={0} {...field} aria-invalid={fieldState.invalid} placeholder="Number of extra characters" />
-                                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                                                <Input {...field} aria-invalid={fieldState.invalid} placeholder="Number of extra characters" />
+                                                {fieldState.invalid && <FieldError errors={[fieldState.error]} className="absolute bottom-2 right-0" />}
                                             </Field>
                                         )}
                                     />}
@@ -527,7 +531,7 @@ export default function CommissionForm() {
                                     render={({ field, fieldState }) => (
                                         <Field className="border bg-card p-4 rounded-md">
                                             <FieldLabel><Image className="inline w-4 h-4" /> Character Reference Images</FieldLabel>
-                                            <MultiImageInput />
+                                            <MultiImageInput images={field.value} setImages={field.onChange} />
                                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                         </Field>
                                     )}
