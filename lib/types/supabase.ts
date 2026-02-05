@@ -80,7 +80,8 @@ export type Database = {
           description: string | null
           id: string
           is_active: boolean | null
-          price: number | null
+          price_php: number | null
+          price_usd: number | null
           title: string
         }
         Insert: {
@@ -88,7 +89,8 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean | null
-          price?: number | null
+          price_php?: number | null
+          price_usd?: number | null
           title: string
         }
         Update: {
@@ -96,7 +98,8 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean | null
-          price?: number | null
+          price_php?: number | null
+          price_usd?: number | null
           title?: string
         }
         Relationships: []

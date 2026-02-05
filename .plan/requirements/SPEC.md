@@ -65,7 +65,8 @@ Manageable list of add-ons.
 | `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
 | `title` | `text` | - | Display Name (e.g. "Complex bg") |
 | `description` | `text` | - | Details |
-| `price` | `numeric` | 0 | Price increase |
+| `price_php` | `numeric` | 0 | Local Price |
+| `price_usd` | `numeric` | 0 | International Price |
 | `is_active` | `boolean` | `true` | Show in form? |
 
 ### 4. `system_settings` (Config)

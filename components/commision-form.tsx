@@ -22,7 +22,7 @@ import { Checkbox } from "./ui/checkbox";
 import useSystemSettings, { SystemSettings } from "@/hooks/use-system-settings";
 import { CommissionAddon, useCommissionAddons } from "@/hooks/use-commission-addons";
 import { Textarea } from "./ui/textarea";
-import { useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { snakeCaseToTitleCase } from "@/lib/utils/string-utils";
 import MultiImageInput from "./multi-image-input";
@@ -84,7 +84,15 @@ const formSchema = z.object({
     addon_extra_characters_count: z.coerce.number<string>().optional(),
     addon_commercial: z.boolean(),
     intended_use: z.string().min(1, "Intended use is required"),
-    other_addons: z.array(z.object({ id: z.string().nullable(), title: z.string().nullable(), description: z.string().nullable(), price: z.number().nullable(), is_active: z.boolean().nullable() })),
+    other_addons: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string().nullable(),
+        price_php: z.number().nullable(),
+        price_usd: z.number().nullable(),
+        is_active: z.boolean().nullable(),
+        created_at: z.string().nullable(),
+    })),
     // Creative Brief
     character_name: z.string().min(1, "Character name is required"),
     character_physical_desc: z.string().min(1, "Character physical description is required"),
@@ -130,32 +138,32 @@ type FormOutput = z.output<typeof formSchema>;
 
 const fieldPlaceholders: Record<keyof typeof formSchema.shape, string> = {
     // Identity & Contact
-    client_name: "What is your name?",
-    client_email: "What is your email address?",
-    social_platform: "What social platform do you use?",
-    social_handle: "What is your social handle?",
+    client_name: "What should I call you? (Your name or nickname)",
+    client_email: "Where should I send updates and your final artwork?",
+    social_platform: "Which platform is best to reach you on?",
+    social_handle: "Your username so I can find you or tag you later!",
     // Technical Specs
-    commission_type: "What type of commission do you want?",
-    priority_level: "What is your priority level?",
-    addon_extra_characters: "Do you want extra characters?",
-    addon_extra_characters_count: "How many extra characters do you want?",
-    addon_commercial: "Do you want commercial use?",
-    intended_use: "What is the intended use of this commission?",
-    other_addons: "Do you want any other addons?",
+    commission_type: "Select the illustration style that fits your vision.",
+    priority_level: "When do you need this masterpiece finished?",
+    addon_extra_characters: "Would you like to add more friends to the scene?",
+    addon_extra_characters_count: "How many additional characters should I include?",
+    addon_commercial: "Is this for a business, streaming, or commercial project?",
+    intended_use: "Tell me a little about what this piece will be used for!",
+    other_addons: "Any extra bells and whistles you'd like to add?",
     // Creative Brief
-    character_name: "What is your character's name?",
-    character_physical_desc: "Describe your character's physical appearance in detail.",
-    character_personality: "Describe your character's personality in detail.",
-    character_pose: "Describe your character's pose in detail.",
-    character_setting: "Describe your character's setting in detail.",
-    character_lighting: "Describe your character's lighting in detail.",
-    image_submit_option: "How do you want to submit your reference images?",
-    direct_upload_images: "Upload reference images for your character.",
-    image_links: "Enter your one or more image links.",
-    google_drive_folder: "Enter your Google Drive folder link.",
+    character_name: "What is the name of the character I'll be drawing?",
+    character_physical_desc: "Describe their hair, eyes, outfit, and any unique details I should know!",
+    character_personality: "What are they like? This helps me capture their 'vibe' and soul!",
+    character_pose: "How should they be standing or sitting? Feel free to be specific!",
+    character_setting: "Where does this take place? Describe the background or atmosphere.",
+    character_lighting: "What's the mood? (e.g., warm sunset, dramatic shadows, soft indoor light)",
+    image_submit_option: "Pick the easiest way for you to share your reference materials.",
+    direct_upload_images: "Upload your reference files directly (up to 5 images).",
+    image_links: "Paste links to your reference images or mood boards here.",
+    google_drive_folder: "Paste the link to your shared Google Drive folder here.",
     // TOS
-    tos_agreed: "Do you agree to the terms and conditions?",
-    deposit_agreed: "By checking this box, you agree to pay the non-refundable deposit and that the work will begin after payment.",
+    tos_agreed: "I have read and agree to the artist's Terms of Service.",
+    deposit_agreed: "I agree to pay the non-refundable deposit to secure my spot and start the work.",
 }
 
 function calculateCostSummary(data: FormInput, settings: SystemSettings, currency: typeof ACCEPTABLE_CURRENCY[number] = 'PHP'): CostSummary {
@@ -206,17 +214,15 @@ function calculateCostSummary(data: FormInput, settings: SystemSettings, currenc
     }
 
     if (other_addons && other_addons.length > 0) {
-        console.log(other_addons)
         other_addons.forEach((addon) => {
-            if (!addon.title || !addon.price) {
-                return
+            const addonPrice = currency === "PHP" ? addon.price_php : addon.price_usd
+            if (addon.title && addonPrice) {
+                subtotal += addonPrice
+                summary.addons.push({
+                    name: addon.title,
+                    price: addonPrice
+                })
             }
-            const addonPrice = addon.price
-            subtotal += addonPrice
-            summary.addons.push({
-                name: addon.title,
-                price: addonPrice
-            })
         })
     }
 
@@ -237,7 +243,9 @@ function calculateCostSummary(data: FormInput, settings: SystemSettings, currenc
 }
 
 
-export default function CommissionForm() {
+export default function CommissionForm({ location }: { location?: Promise<string | undefined> }) {
+    const country = location ? use(location) : "PH"
+    const currency = country === "PH" ? "PHP" : "USD"
     const { tierListOptions, tierListMap } = useTierList()
     const { systemSettings } = useSystemSettings()
     const { commissionAddons } = useCommissionAddons()
@@ -269,7 +277,7 @@ export default function CommissionForm() {
             deposit_agreed: false,
         }
     })
-    const costSummary = useMemo<CostSummary>(() => calculateCostSummary(form.watch(), systemSettings, "PHP"), [form.watch(), systemSettings])
+    const costSummary = useMemo<CostSummary>(() => calculateCostSummary(form.watch(), systemSettings, currency), [form.watch(), systemSettings, currency])
     const hasBackgroundAddon = useMemo(() => form.watch("other_addons").some((addon) => addon.id?.includes("background")), [form.watch("other_addons")])
 
     const handleSubmit = (data: z.infer<typeof formSchema>) => {
@@ -281,12 +289,12 @@ export default function CommissionForm() {
         return values.some((addon) => addon.id === addonId)
     }
 
-    const handleAddonChange = (addon: CommissionAddon, value: boolean, currentAddons?: CommissionAddon[]) => {
+    const handleAddonChange = (addon: CommissionAddon, value: boolean, currentAddons?: FormOutput["other_addons"]) => {
         if (!currentAddons) return
         if (value) {
-            form.setValue("other_addons", [...currentAddons, addon])
+            form.setValue("other_addons", [...currentAddons, addon] as FormOutput["other_addons"])
         } else {
-            form.setValue("other_addons", currentAddons.filter((addon) => addon.id !== addon.id))
+            form.setValue("other_addons", currentAddons.filter((item) => item.id !== addon.id))
         }
     }
 
@@ -482,7 +490,7 @@ export default function CommissionForm() {
                                                 control={form.control}
                                                 render={({ field, fieldState }) => (
                                                     <Field orientation="horizontal">
-                                                        <Checkbox id={addon.id} aria-disabled={fieldState.invalid} checked={isAddonSelected(addon.id, field.value as CommissionAddon[])} onCheckedChange={(value) => handleAddonChange(addon, value === true, field.value as CommissionAddon[])} />
+                                                        <Checkbox id={addon.id} aria-disabled={fieldState.invalid} checked={isAddonSelected(addon.id, field.value as FormOutput["other_addons"])} onCheckedChange={(value) => handleAddonChange(addon, value === true, field.value as FormOutput["other_addons"])} />
                                                         <FieldContent>
                                                             <FieldLabel htmlFor={addon.id}>{addon.title}</FieldLabel>
                                                             <FieldDescription>{addon.description}</FieldDescription>

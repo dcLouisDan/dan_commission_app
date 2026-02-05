@@ -1,7 +1,9 @@
 import { updateSession } from "@/lib/supabase/proxy";
 import { type NextRequest } from "next/server";
+import { setLocationCookie } from "./lib/utils/location";
 
 export async function proxy(request: NextRequest) {
+  setLocationCookie(request);
   return await updateSession(request);
 }
 

@@ -63,7 +63,8 @@ create table commission_addons (
   created_at timestamptz default now(),
   title text not null,
   description text,
-  price numeric default 0,
+  price_php numeric default 0,
+  price_usd numeric default 0,
   is_active boolean default true
 );
 

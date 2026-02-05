@@ -102,6 +102,18 @@ alter table commission_tiers
 -- alter table commission_tiers drop column if exists base_price;
 -- alter table commission_tiers drop column if exists currency;
 
+-- ==========================================
+-- NEWLY ADDED: Commission Addons Dual Currency
+-- ==========================================
+
+-- 1. Add price_php and price_usd to commission_addons
+alter table commission_addons
+  add column if not exists price_php numeric default 0,
+  add column if not exists price_usd numeric default 0;
+
+-- 2. Cleanup old price column (Optional)
+-- alter table commission_addons drop column if exists price;
+
 -- 4. Re-apply Public Select Policy for Tiers
 drop policy if exists "Public can view active tiers" on commission_tiers;
 create policy "Public can view active tiers"
