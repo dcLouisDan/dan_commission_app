@@ -11,12 +11,13 @@ import CustomerInfoSection, { CUSTOMER_INFO_FIELDS } from "./commission/form/cus
 import CommissionSpecsSection, { COMMISSION_SPECS_FIELDS } from "./commission/form/commission-specs-section";
 import CreativeBriefSection, { CREATIVE_BRIEF_FIELDS } from "./commission/form/creative-brief-section";
 import ReferenceImagesSection, { REFERENCE_IMAGES_FIELDS } from "./commission/form/reference-images-section";
-import CostSummarySidebar from "./commission/form/cost-summary-sidebar";
+import SubmissionSummarySection from "./commission/form/submission-summary-section";
 import useBasicPagination from "@/hooks/use-basic-pagination";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Spinner } from "./ui/spinner";
+import { cn } from "@/lib/utils";
 
 const MAX_PAGES = 5
 
@@ -85,7 +86,7 @@ export default function CommissionForm() {
             case 4:
                 return <ReferenceImagesSection />
             case 5:
-                return <CostSummarySidebar />
+                return <SubmissionSummarySection />
             default:
                 return <CustomerInfoSection />
         }
@@ -100,9 +101,9 @@ export default function CommissionForm() {
                 <FieldGroup>
                     <div className="flex items-center justify-between">
                         <Button disabled={!hasPrev} variant="outline" size="lg" type="button" onClick={prev}><ChevronLeft /> Back</Button>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="hidden sm:flex items-center justify-center gap-2">
                             {Array.from({ length: MAX_PAGES }).map((_, i) => (
-                                <Button key={i} variant={page == i + 1 ? "default" : "outline"} size="icon" className="rounded-full hidden sm:block" type="button" onClick={() => setPage(i + 1)}>{i + 1}</Button>
+                                <div key={i} className={cn("rounded-full h-10 w-10 border relative flex items-center justify-center text-muted-foreground", page === i + 1 && "bg-primary text-primary-foreground")}>{i + 1}</div>
                             ))}
                         </div>
                         <Button disabled={!hasNext || isValidatingPage} size="lg" type="button" onClick={async () => {

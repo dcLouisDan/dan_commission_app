@@ -48,7 +48,7 @@ export const formSchema = z.object({
     character_pose: z.string().min(1, "Character pose is required"),
     character_setting: z.string().min(1, "Character setting is required"),
     character_lighting: z.string().min(1, "Character lighting is required"),
-    image_submit_option: z.enum(IMAGE_SUBMIT_OPTIONS),
+    image_submit_option: z.enum(IMAGE_SUBMIT_OPTIONS).default("direct_upload"),
     google_drive_folder: z.preprocess((val: string) => val.trim().length > 0 ? val : undefined, z.url("Invalid google drive folder url")).optional(),
     image_links: z.preprocess((val: string[]) => val.filter((link) => link.trim().length > 0), z.array(z.url("Invalid image link"))).optional(),
     direct_upload_images: z.array(imageSchema).optional(),
@@ -65,7 +65,7 @@ export const formSchema = z.object({
     path: ["social_handle"]
 }).refine((data) => {
     if (data.image_submit_option === "direct_upload") {
-        return data.direct_upload_images && data.direct_upload_images.length > 0
+        return data.direct_upload_images && data.direct_upload_images.length >= 1
     }
     return true
 }, {

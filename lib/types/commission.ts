@@ -1,4 +1,5 @@
-export interface CostSummary {
+export interface CommissionSummary {
+    // Cost Breakdown
     base_price: number;
     addons: {
         name: string;

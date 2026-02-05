@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/field"
 import { useFormContext } from "react-hook-form"
 import { FormInput, FormOutput } from "@/lib/validations/commission"
-import { calculateCostSummary } from "@/lib/logic/commission"
+import { parseSummary } from "@/lib/logic/commission"
 import useSystemSettings from "@/hooks/use-system-settings"
 import { TypographyH5 } from "@/components/typography"
 import { Separator } from "@/components/ui/separator"
@@ -21,16 +21,17 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useMemo } from "react"
-import { CostSummary } from "@/lib/types/commission"
+import { CommissionSummary } from "@/lib/types/commission"
 import { useServerLocation } from "@/hooks/use-server-location"
+import { cn } from "@/lib/utils"
+import { snakeCaseToTitleCase } from "@/lib/utils/string-utils"
 
-export default function CostSummarySidebar() {
+export default function SubmissionSummarySection() {
     const { currency } = useServerLocation()
     const { systemSettings } = useSystemSettings()
     const form = useFormContext<FormInput, unknown, FormOutput>()
     const canSubmit = form.formState.isValid && !form.formState.isSubmitting && form.watch("tos_agreed") && form.watch("deposit_agreed")
-    const costSummary = useMemo<CostSummary>(() => calculateCostSummary(form.watch(), systemSettings, currency), [form.watch(), systemSettings, currency])
-
+    const CommissionSummary = useMemo<CommissionSummary>(() => parseSummary(form.watch(), systemSettings, currency), [form.watch(), systemSettings, currency])
     return (
         <FieldSet>
             <FieldLegend className="text-center">Summary</FieldLegend>
@@ -38,11 +39,19 @@ export default function CostSummarySidebar() {
             <div className="grid md:grid-cols-2 gap-8">
                 <div className="w-full h-full border p-4 rounded-2xl border-secondary/50 border-dashed flex flex-col gap-4">
                     <TypographyH5>Customer Information</TypographyH5>
-                    <div className="flex flex-col gap-2">
-                        <p>Name: {form.watch("client_name")}</p>
-                        <p>Email: {form.watch("client_email")}</p>
-                        <p>Social Platform: {form.watch("social_platform")}</p>
-                        <p>Social Handle: {form.watch("social_handle")}</p>
+                    <div className="flex flex-col border-t">
+                        <InfoRow label="Name" value={form.watch("client_name")} />
+                        <InfoRow label="Email" value={form.watch("client_email")} />
+                        <InfoRow toTitleCase label="Social Platform" value={form.watch("social_platform")} />
+                        <InfoRow label="Social Handle" value={form.watch("social_handle")} />
+                    </div>
+                    <TypographyH5>Creative Brief</TypographyH5>
+                    <div className="flex flex-col border-t">
+                        <InfoRow toTitleCase label="Character Name" value={form.watch("character_name")} />
+                        <InfoRow toTitleCase label="Character Physical Description" value={form.watch("character_physical_desc")} />
+                        <InfoRow toTitleCase label="Character Personality" value={form.watch("character_personality")} />
+                        <InfoRow toTitleCase label="Character Setting" value={form.watch("character_setting")} />
+                        <InfoRow toTitleCase label="Character Lighting" value={form.watch("character_lighting")} />
                     </div>
                 </div>
                 <div className="w-full h-fit flex flex-col gap-4">
@@ -51,12 +60,12 @@ export default function CostSummarySidebar() {
                         <Separator />
                         <div className="flex items-center justify-between">
                             <p>Base Price <span className="text-secondary-foreground/70">{form.watch("commission_type") && `(${form.watch("commission_type").category} - ${form.watch("commission_type").variant})`}</span></p>
-                            <p>₱{costSummary.base_price}</p>
+                            <p>₱{CommissionSummary.base_price}</p>
                         </div>
-                        {costSummary.addons.length > 0 && (
+                        {CommissionSummary.addons.length > 0 && (
                             <div className="flex flex-col gap-2">
                                 <p className=" font-semibold">Add-ons</p>
-                                {costSummary.addons.map((addon) => (
+                                {CommissionSummary.addons.map((addon) => (
                                     <div key={addon.name} className="flex items-center justify-between pl-2">
                                         <p className="text-sm">{addon.name}</p>
                                         <p className="text-sm">₱{addon.price}</p>
@@ -67,29 +76,29 @@ export default function CostSummarySidebar() {
                         <div className="border-dashed border border-secondary-foreground/20" />
                         <div className="flex items-center justify-between text-sm">
                             <p>Subtotal</p>
-                            <p>₱{costSummary.subtotal}</p>
+                            <p>₱{CommissionSummary.subtotal}</p>
                         </div>
-                        {systemSettings.rush_multiplier && costSummary.rush_fee > 0 && <div className="flex items-center justify-between text-sm text-secondary-foreground/70">
+                        {systemSettings.rush_multiplier && CommissionSummary.rush_fee > 0 && <div className="flex items-center justify-between text-sm text-secondary-foreground/70">
                             <p>Rush Fee ({systemSettings.rush_multiplier * 100}%)</p>
-                            <p>₱{costSummary.rush_fee}</p>
+                            <p>₱{CommissionSummary.rush_fee}</p>
                         </div>}
                         {systemSettings.tax_rate! > 0 && <div className="flex items-center justify-between text-sm text-secondary-foreground/70">
                             <p>Tax ({systemSettings.tax_rate}%)</p>
-                            <p>₱{costSummary.tax}</p>
+                            <p>₱{CommissionSummary.tax}</p>
                         </div>}
                         {(systemSettings.xendit_fee_percent || systemSettings.xendit_fee_fixed) && <div className="flex text-sm items-center justify-between text-secondary-foreground/70">
                             <p>Xendit Fee ({systemSettings.xendit_fee_percent! * 100}%)</p>
-                            <p>₱{costSummary.xendit_fee}</p>
+                            <p>₱{CommissionSummary.xendit_fee}</p>
                         </div>}
                         <Separator />
                         <div className="flex items-center justify-between text-base font-bold">
                             <p>Total</p>
-                            <p>₱{costSummary.total}</p>
+                            <p>₱{CommissionSummary.total}</p>
                         </div>
                         <div className="border-dashed border border-secondary-foreground/20" />
                         <div className="flex items-center justify-between text-sm">
                             <p>Initial Deposit</p>
-                            <p>₱{costSummary.deposit}</p>
+                            <p>₱{CommissionSummary.deposit}</p>
                         </div>
                     </div>
                     <div className="border p-4 rounded-md bg-card">
@@ -126,5 +135,17 @@ export default function CostSummarySidebar() {
                 </div>
             </div>
         </FieldSet>
+    )
+}
+
+function InfoRow({ label, value, toTitleCase = false, className }: { label: string, value: string, toTitleCase?: boolean, className?: string }) {
+    if (!value) {
+        return null
+    }
+    return (
+        <div className={cn("grid grid-cols-2 items-center justify-between text-sm border-b pb-1", className)}>
+            <p className="font-semibold">{label}:</p>
+            <p className="text-right">{toTitleCase ? snakeCaseToTitleCase(value) : value}</p>
+        </div>
     )
 }
