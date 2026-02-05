@@ -1,6 +1,9 @@
-import { cookies } from "next/headers";
+import { ACCEPTABLE_CURRENCY } from '@/lib/constants/app';
+import Cookies from 'js-cookie'
 
-export async function useServerLocation() {
-    const location = (await cookies()).get("location")?.value;
-    return location;
+export function useServerLocation() {
+    const location = Cookies.get("location");
+    const country = location ? location : "PH"
+    const currency: typeof ACCEPTABLE_CURRENCY[number] = country === "PH" ? "PHP" : "USD"
+    return { location, country, currency };
 }

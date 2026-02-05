@@ -8,7 +8,7 @@ const MAX_IMAGE_SIZE = 1024 * 1024 * 10;
 const MAX_IMAGE_COUNT = 10;
 const ALLOWED_IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp"];
 
-export default function MultImageInput({ images, setImages }: { images: File[], setImages: (images: File[]) => void }) {
+export default function MultiImageInput({ images, setImages }: { images: File[], setImages: (images: File[]) => void }) {
     const imagePreviewUrls = useMemo(() => images.map((image) => URL.createObjectURL(image)), [images]);
 
     const onDrop = (acceptedFiles: File[]) => {

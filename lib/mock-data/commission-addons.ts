@@ -4,7 +4,7 @@ export const MOCK_COMMISSION_ADDONS: Database['public']['Tables']['commission_ad
     {
         id: "addon-simple-background",
         title: "Simple Background",
-        description: "Adds a simple background to the artwork.",
+        description: "Adds a simple background to the artwork. (e.g., solid color, gradient)",
         price_php: 500,
         price_usd: 15,
         is_active: true,
@@ -13,7 +13,7 @@ export const MOCK_COMMISSION_ADDONS: Database['public']['Tables']['commission_ad
     {
         id: "addon-complex-background",
         title: "Complex Background",
-        description: "Adds a complex background to the artwork.",
+        description: "Adds a more detailed background to the artwork. (e.g., complex environment, detailed setting)",
         price_php: 1000,
         price_usd: 30,
         is_active: true,
