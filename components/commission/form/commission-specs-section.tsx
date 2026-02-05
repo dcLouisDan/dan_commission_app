@@ -21,6 +21,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import useSystemSettings from "@/hooks/use-system-settings";
 import { useMemo } from "react";
 
+export const COMMISSION_SPECS_FIELDS: (keyof FormInput)[] = [
+    "commission_type",
+    "priority_level",
+    "addon_extra_characters",
+    "addon_extra_characters_count",
+    "addon_commercial",
+    "intended_use",
+    "other_addons"
+]
+
 export default function CommissionSpecsSection() {
     const form = useFormContext<FormInput>()
     const { tierListOptions, tierListMap } = useTierList()
@@ -42,8 +52,8 @@ export default function CommissionSpecsSection() {
     const hasBackgroundAddon = useMemo(() => form.watch("other_addons").some((addon) => addon.id?.includes("background")), [form.watch("other_addons")])
     return (
         <FieldSet>
-            <FieldLegend>Commission Information</FieldLegend>
-            <FieldDescription>
+            <FieldLegend className="text-center">Commission Information</FieldLegend>
+            <FieldDescription className="text-center">
                 Please provide the details for your commission request below.
             </FieldDescription>
             <Controller

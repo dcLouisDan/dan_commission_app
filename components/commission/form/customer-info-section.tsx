@@ -7,12 +7,19 @@ import { useFormContext } from "react-hook-form"
 import type { FormInput } from "@/lib/validations/commission"
 import BasicSelect from "@/components/basic-select"
 
+export const CUSTOMER_INFO_FIELDS: (keyof FormInput)[] = [
+    "client_name",
+    "client_email",
+    "social_platform",
+    "social_handle"
+]
+
 export default function CustomerInfoSection() {
     const form = useFormContext<FormInput>()
     return (
         <FieldSet>
-            <FieldLegend>Customer Information</FieldLegend>
-            <FieldDescription>
+            <FieldLegend className="text-center">Customer Information</FieldLegend>
+            <FieldDescription className="text-center">
                 Tell us a bit about yourself so we can stay in touch regarding your commission.
             </FieldDescription>
             <FieldGroup>
@@ -45,17 +52,18 @@ export default function CustomerInfoSection() {
                         <Field orientation="responsive" data-invalid={fieldState.invalid}>
                             <FieldContent>
                                 <FieldLabel>Social Platform</FieldLabel>
-                                <FieldDescription>Where's the best place for us to reach out to you?</FieldDescription>
+                                <FieldDescription>{FIELD_PLACEHOLDERS.social_platform}</FieldDescription>
                             </FieldContent>
-                            <BasicSelect
-                                options={SOCIAL_PLATFORMS_SELECT_ITEMS}
-                                placeholder={FIELD_PLACEHOLDERS.social_platform}
-                                disabled={fieldState.invalid}
-                                defaultValue="email"
-                                value={field.value}
-                                onValueChange={(value) => form.setValue("social_platform", value)}
-                                ariaInvalid={fieldState.invalid}
-                            />
+                            <div className="flex-1/2 sm:max-w-64">
+                                <BasicSelect
+                                    options={SOCIAL_PLATFORMS_SELECT_ITEMS}
+                                    placeholder="Select a social platform"
+                                    disabled={fieldState.invalid}
+                                    value={field.value}
+                                    onValueChange={(value) => form.setValue("social_platform", value)}
+                                    ariaInvalid={fieldState.invalid}
+                                />
+                            </div>
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}

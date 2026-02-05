@@ -1,25 +1,10 @@
 import { BasicSelectItem, stringArrayToBasicSelectItems } from "@/components/basic-select";
 import { Constants } from "@/lib/types/supabase";
-import { formSchema } from "../validations/commission";
+import { snakeCaseToTitleCase } from "../utils/string-utils";
 
-export const SOCIAL_PLATFORMS_SELECT_ITEMS: BasicSelectItem[] = [
-    {
-        value: "email",
-        label: "Email"
-    },
-    {
-        value: "facebook_messenger",
-        label: "Facebook Messenger"
-    },
-    {
-        value: "viber",
-        label: "Viber"
-    },
-    {
-        value: "twitter",
-        label: "Twitter"
-    }
-]
+export const SOCIAL_PLATFORMS = ['email', 'facebook_messenger', 'viber', 'twitter'] as const;
+
+export const SOCIAL_PLATFORMS_SELECT_ITEMS: BasicSelectItem[] = stringArrayToBasicSelectItems(Array.from(SOCIAL_PLATFORMS), snakeCaseToTitleCase)
 
 export const SOCIAL_PLATFORM_HANDLE_LABELS: Record<string, string> = {
     email: "Email Address",

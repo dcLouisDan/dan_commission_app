@@ -19,6 +19,13 @@ import { FIELD_PLACEHOLDERS } from "@/lib/constants/commision-form";
 import { useFormContext } from "react-hook-form";
 import MultiImageInput from "@/components/multi-image-input";
 
+export const REFERENCE_IMAGES_FIELDS: (keyof FormInput)[] = [
+    "image_submit_option",
+    "google_drive_folder",
+    "direct_upload_images",
+    "image_links"
+]
+
 export default function ReferenceImagesSection() {
     const form = useFormContext<FormInput, unknown, FormOutput>();
     const onUploadMethodChange = () => {
@@ -28,9 +35,9 @@ export default function ReferenceImagesSection() {
     }
     return (
         <FieldSet>
-            <FieldLegend>Reference Images</FieldLegend>
-            <FieldDescription>Upload reference images for your character.</FieldDescription>
-            <div className="grid grid-cols-3 gap-4">
+            <FieldLegend className="text-center">Reference Images</FieldLegend>
+            <FieldDescription className="text-center">Upload reference images for your character.</FieldDescription>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Controller
                     name="image_submit_option"
                     control={form.control}
@@ -55,7 +62,7 @@ export default function ReferenceImagesSection() {
                             <Field className="border bg-card p-4 rounded-md">
                                 <FieldLabel><Image className="inline w-4 h-4" /> Upload Reference Images</FieldLabel>
                                 <FieldDescription>{FIELD_PLACEHOLDERS.direct_upload_images}</FieldDescription>
-                                <MultiImageInput images={field.value} setImages={field.onChange} />
+                                <MultiImageInput images={field.value ?? []} setImages={field.onChange} />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

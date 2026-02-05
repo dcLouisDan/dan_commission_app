@@ -5,7 +5,7 @@ export default function ImageWithPreview({ src, alt, previewClassName }: { src: 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <img src={src} alt={alt} className={cn("w-full h-full object-cover cursor-pointer", previewClassName)} />
+                <img title="Preview Image" src={src} alt={alt} className={cn("w-full h-full object-cover cursor-pointer", previewClassName)} />
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader className="sr-only">

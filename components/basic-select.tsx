@@ -7,7 +7,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import * as SelectPrimitive from "@radix-ui/react-select"
 import { cn } from "@/lib/utils"
 
 export interface BasicSelectItem {
@@ -30,9 +29,9 @@ export function stringArrayToBasicSelectItems(arr: string[], transformFn?: (item
     return arr.map((item) => ({ value: item, label: transformFn ? transformFn(item) : item }))
 }
 
-export default function BasicSelect({ options, placeholder = "Select an option", onValueChange, defaultValue, className, disabled, ariaInvalid }: BasicSelectProps) {
+export default function BasicSelect({ options, placeholder = "Select an option", onValueChange, defaultValue, className, disabled, ariaInvalid, value }: BasicSelectProps) {
     return (
-        <Select defaultValue={defaultValue} disabled={disabled} onValueChange={onValueChange}>
+        <Select defaultValue={defaultValue} value={value} disabled={disabled} onValueChange={onValueChange}>
             <SelectTrigger aria-invalid={ariaInvalid} className={cn("w-full", className)}>
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>

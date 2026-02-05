@@ -1,5 +1,5 @@
 "use client"
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDropzone } from 'react-dropzone'
 import ImageWithPreview from "./image-with-preview";
@@ -33,7 +33,17 @@ export default function MultiImageInput({ images, setImages }: { images: File[],
             {images.length > 0 && (
                 <div className="w-full h-fit min-h-[200px] border-2 border-dashed rounded-md relative grid grid-cols-4">
                     {images.map((image, index) => (
-                        <ImageWithPreview key={index} src={imagePreviewUrls[index]} alt={`Image ${index + 1}`} previewClassName="h-32 w-32 object-cover border-2 overflow-hidden" />
+                        <div
+                            key={index}
+                            className="relative h-32 w-32"
+                        >
+                            <ImageWithPreview
+                                src={imagePreviewUrls[index]}
+                                alt={`Image ${index + 1}`}
+                                previewClassName="object-cover border-2 overflow-hidden"
+                            />
+                            <button title="Remove image" type="button" onClick={() => setImages(images.filter((_, i) => i !== index))} className="cursor-pointer absolute top-1 right-1 bg-destructive text-white rounded-full p-1"><X /></button>
+                        </div>
                     ))}
                     <div {...getRootProps()} className="h-32 w-32 border-2  rounded-md">
                         <input {...getInputProps()} />

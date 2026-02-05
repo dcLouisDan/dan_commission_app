@@ -14,6 +14,15 @@ import { FormInput } from "@/lib/validations/commission"
 import { useMemo } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 
+export const CREATIVE_BRIEF_FIELDS: (keyof FormInput)[] = [
+    "character_name",
+    "character_physical_desc",
+    "character_personality",
+    "character_pose",
+    "character_setting",
+    "character_lighting"
+]
+
 export default function CreativeBriefSection() {
     const form = useFormContext<FormInput>()
     const hasBackgroundAddon = useMemo(() => form.watch("other_addons").some((addon) => addon.id?.includes("background")), [form.watch("other_addons")])
@@ -21,8 +30,8 @@ export default function CreativeBriefSection() {
     return (
 
         <FieldSet>
-            <FieldLegend>The Creative Brief</FieldLegend>
-            <FieldDescription>Tell me about your character and the vision you have for this commission.</FieldDescription>
+            <FieldLegend className="text-center">The Creative Brief</FieldLegend>
+            <FieldDescription className="text-center">Tell me about your character and the vision you have for this commission.</FieldDescription>
             <FieldGroup>
                 <Controller
                     name="character_name"

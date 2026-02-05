@@ -7,7 +7,7 @@ export default function CommissionsLayout({ children }: { children: React.ReactN
         <main className="min-h-screen flex flex-col items-center">
             <div className="flex-1 w-full flex flex-col gap-12 items-center">
                 <AppHeader />
-                <main className="flex-1 flex max-w-5xl w-full">
+                <main className="flex-1 flex max-w-5xl w-full px-4 sm:px-0">
                     {children}
                 </main>
                 <AppFooter />
