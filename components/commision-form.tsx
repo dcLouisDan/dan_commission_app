@@ -19,7 +19,7 @@ import BasicSelect from "./basic-select";
 import { SOCIAL_PLATFORM_HANDLE_LABELS, SOCIAL_PLATFORMS_SELECT_ITEMS } from "@/lib/constants/commision-form";
 import { useTierList } from "@/hooks/use-tier-list";
 import { Checkbox } from "./ui/checkbox";
-import useSystemSettings from "@/hooks/use-system-settings";
+import useSystemSettings, { SystemSettings } from "@/hooks/use-system-settings";
 import { CommissionAddon, useCommissionAddons } from "@/hooks/use-commission-addons";
 import { Textarea } from "./ui/textarea";
 import { useMemo, useState } from "react";
@@ -31,6 +31,8 @@ import { Button } from "./ui/button";
 import { TypographyH5 } from "./typography";
 import { Separator } from "./ui/separator";
 import Link from "next/link";
+import { type CommissionTier } from "@/hooks/use-tier-list";
+import { ACCEPTABLE_CURRENCY } from "@/lib/constants/app";
 
 const IMAGE_SUBMIT_OPTIONS = ['direct_upload', 'google_drive_folder', 'image_links'] as const;
 type ImageSubmitOption = typeof IMAGE_SUBMIT_OPTIONS[number];
@@ -56,6 +58,7 @@ interface CostSummary {
     subtotal: number;
     tax: number;
     xendit_fee: number;
+    rush_fee: number;
     total: number;
     deposit: number;
 }
@@ -67,13 +70,19 @@ const formSchema = z.object({
     social_platform: z.string().min(1, "Social platform is required"),
     social_handle: z.string(),
     // Technical Specs
-    commission_type: z.string().min(1, "Commission type is required"),
+    commission_type: z.object({
+        id: z.string().optional(),
+        category: z.string().nullable(),
+        variant: z.string().nullable(),
+        price_php: z.number().nullable(),
+        price_usd: z.number().nullable(),
+        is_active: z.boolean().nullable(),
+        created_at: z.string().nullable(),
+    }),
     priority_level: z.enum(Constants.public.Enums.priority_level_enum),
-    tier_id: z.string().min(1, "Tier is required"),
     addon_extra_characters: z.boolean(),
     addon_extra_characters_count: z.coerce.number<string>().optional(),
     addon_commercial: z.boolean(),
-    rush_order: z.boolean(),
     intended_use: z.string().min(1, "Intended use is required"),
     other_addons: z.array(z.object({ id: z.string().nullable(), title: z.string().nullable(), description: z.string().nullable(), price: z.number().nullable(), is_active: z.boolean().nullable() })),
     // Creative Brief
@@ -128,11 +137,9 @@ const fieldPlaceholders: Record<keyof typeof formSchema.shape, string> = {
     // Technical Specs
     commission_type: "What type of commission do you want?",
     priority_level: "What is your priority level?",
-    tier_id: "What tier do you want?",
     addon_extra_characters: "Do you want extra characters?",
     addon_extra_characters_count: "How many extra characters do you want?",
     addon_commercial: "Do you want commercial use?",
-    rush_order: "Do you want a rush order?",
     intended_use: "What is the intended use of this commission?",
     other_addons: "Do you want any other addons?",
     // Creative Brief
@@ -151,9 +158,87 @@ const fieldPlaceholders: Record<keyof typeof formSchema.shape, string> = {
     deposit_agreed: "By checking this box, you agree to pay the non-refundable deposit and that the work will begin after payment.",
 }
 
+function calculateCostSummary(data: FormInput, settings: SystemSettings, currency: typeof ACCEPTABLE_CURRENCY[number] = 'PHP'): CostSummary {
+    const summary: CostSummary = {
+        base_price: 0,
+        addons: [],
+        subtotal: 0,
+        tax: 0,
+        xendit_fee: 0,
+        rush_fee: 0,
+        total: 0,
+        deposit: 0,
+    }
+
+    const { commission_type, addon_extra_characters, addon_extra_characters_count, addon_commercial, priority_level, other_addons } = data
+    const { commercial_multiplier, rush_multiplier, extra_character_multiplier, tax_rate, xendit_fee_fixed, xendit_fee_percent } = settings
+
+    if (!commission_type) {
+        return summary
+    }
+
+    const { price_php, price_usd } = commission_type
+
+    if (!price_php || !price_usd) {
+        return summary
+    }
+
+    const basePrice = currency === "PHP" ? price_php : price_usd
+    let subtotal = basePrice;
+
+    const count = Number(addon_extra_characters_count)
+    if (addon_extra_characters && addon_extra_characters_count && count > 0 && extra_character_multiplier) {
+        const addonPrice = basePrice * count * extra_character_multiplier
+        subtotal += addonPrice
+        summary.addons.push({
+            name: `Extra Characters (${count})`,
+            price: addonPrice
+        })
+    }
+
+    if (addon_commercial && commercial_multiplier) {
+        const addonPrice = basePrice * commercial_multiplier
+        subtotal += addonPrice
+        summary.addons.push({
+            name: "Commercial Use",
+            price: addonPrice
+        })
+    }
+
+    if (other_addons && other_addons.length > 0) {
+        console.log(other_addons)
+        other_addons.forEach((addon) => {
+            if (!addon.title || !addon.price) {
+                return
+            }
+            const addonPrice = addon.price
+            subtotal += addonPrice
+            summary.addons.push({
+                name: addon.title,
+                price: addonPrice
+            })
+        })
+    }
+
+    if (priority_level == "RUSH" && rush_multiplier) {
+        const rushFee = subtotal * rush_multiplier
+        summary.rush_fee = rushFee
+    }
+
+    summary.base_price = basePrice
+    summary.subtotal = subtotal
+    summary.tax = tax_rate ? subtotal * tax_rate : 0
+    summary.xendit_fee = xendit_fee_percent ? subtotal * xendit_fee_percent : xendit_fee_fixed ? xendit_fee_fixed : 0
+    summary.total = subtotal + summary.tax + summary.xendit_fee + summary.rush_fee
+    summary.deposit = summary.total * 0.5
+
+
+    return summary
+}
+
 
 export default function CommissionForm() {
-    const { tierListOptions } = useTierList()
+    const { tierListOptions, tierListMap } = useTierList()
     const { systemSettings } = useSystemSettings()
     const { commissionAddons } = useCommissionAddons()
     const form = useForm<FormInput, unknown, FormOutput>({
@@ -163,13 +248,11 @@ export default function CommissionForm() {
             client_email: "",
             social_platform: "email",
             social_handle: "",
-            commission_type: "",
+            commission_type: undefined,
             priority_level: "STANDARD",
-            tier_id: "",
             addon_extra_characters: false,
             addon_extra_characters_count: "0",
             addon_commercial: false,
-            rush_order: false,
             intended_use: "",
             other_addons: [],
             character_name: "",
@@ -186,24 +269,7 @@ export default function CommissionForm() {
             deposit_agreed: false,
         }
     })
-    const [costSummary, setCostSummary] = useState<CostSummary>({
-        base_price: 1000,
-        addons: [
-            {
-                name: "Extra Character",
-                price: 500,
-            },
-            {
-                name: "Commercial Use",
-                price: 1000,
-            },
-        ],
-        subtotal: 2500,
-        tax: 200,
-        xendit_fee: 100,
-        total: 2800,
-        deposit: 1400,
-    })
+    const costSummary = useMemo<CostSummary>(() => calculateCostSummary(form.watch(), systemSettings, "PHP"), [form.watch(), systemSettings])
     const hasBackgroundAddon = useMemo(() => form.watch("other_addons").some((addon) => addon.id?.includes("background")), [form.watch("other_addons")])
 
     const handleSubmit = (data: z.infer<typeof formSchema>) => {
@@ -230,7 +296,6 @@ export default function CommissionForm() {
         form.setValue("google_drive_folder", "")
     }
 
-    console.log(form.formState.errors)
 
     const canSubmit = form.formState.isValid && !form.formState.isSubmitting && form.watch("tos_agreed") && form.watch("deposit_agreed")
 
@@ -310,7 +375,7 @@ export default function CommissionForm() {
                             Please provide the details for your commission request below.
                         </FieldDescription>
                         <Controller
-                            name="tier_id"
+                            name="commission_type"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field orientation="responsive" className="relative">
@@ -320,12 +385,13 @@ export default function CommissionForm() {
                                     </FieldContent>
                                     <BasicSelect
                                         options={tierListOptions}
-                                        placeholder={fieldPlaceholders.tier_id}
-                                        value={field.value}
+                                        placeholder={fieldPlaceholders.commission_type}
+                                        value={field.value?.id as string}
                                         onValueChange={(value) => {
-                                            form.setValue("tier_id", value)
-                                            const tierName = tierListOptions.find((tier) => tier.value === value)?.label
-                                            form.setValue("commission_type", tierName!)
+                                            const tier = tierListMap.get(value)
+                                            if (tier) {
+                                                form.setValue("commission_type", { ...tier })
+                                            }
                                         }}
                                         ariaInvalid={fieldState.invalid}
                                     />
@@ -403,7 +469,7 @@ export default function CommissionForm() {
                                                     <FieldLabel htmlFor="extra-character-checkbox">Number of extra characters</FieldLabel>
                                                     <FieldDescription>How many extra characters do you want to add to this commission?</FieldDescription>
                                                 </FieldContent>
-                                                <Input {...field} aria-invalid={fieldState.invalid} placeholder="Number of extra characters" />
+                                                <Input type="number" min={1} max={5} {...field} aria-invalid={fieldState.invalid} placeholder="Number of extra characters" />
                                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} className="absolute bottom-2 right-0" />}
                                             </Field>
                                         )}
@@ -577,7 +643,7 @@ export default function CommissionForm() {
                         <TypographyH5>Summary</TypographyH5>
                         <Separator />
                         <div className="flex items-center justify-between">
-                            <p>Base Price <span className="text-secondary-foreground/70">{form.watch("commission_type") && `(${form.watch("commission_type")})`}</span></p>
+                            <p>Base Price <span className="text-secondary-foreground/70">{form.watch("commission_type") && `(${form.watch("commission_type").category} - ${form.watch("commission_type").variant})`}</span></p>
                             <p>₱{costSummary.base_price}</p>
                         </div>
                         {costSummary.addons.length > 0 && (
@@ -596,12 +662,16 @@ export default function CommissionForm() {
                             <p>Subtotal</p>
                             <p>₱{costSummary.subtotal}</p>
                         </div>
+                        {systemSettings.rush_multiplier && costSummary.rush_fee > 0 && <div className="flex items-center justify-between text-sm text-secondary-foreground/70">
+                            <p>Rush Fee ({systemSettings.rush_multiplier * 100}%)</p>
+                            <p>₱{costSummary.rush_fee}</p>
+                        </div>}
                         {systemSettings.tax_rate! > 0 && <div className="flex items-center justify-between text-sm text-secondary-foreground/70">
                             <p>Tax ({systemSettings.tax_rate}%)</p>
                             <p>₱{costSummary.tax}</p>
                         </div>}
                         {(systemSettings.xendit_fee_percent || systemSettings.xendit_fee_fixed) && <div className="flex text-sm items-center justify-between text-secondary-foreground/70">
-                            <p>Xendit Fee</p>
+                            <p>Xendit Fee ({systemSettings.xendit_fee_percent! * 100}%)</p>
                             <p>₱{costSummary.xendit_fee}</p>
                         </div>}
                         <Separator />

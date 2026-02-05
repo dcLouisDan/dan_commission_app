@@ -4,8 +4,8 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
     {
         id: "1",
         category: "Tier 1",
-        price_php: 10,
-        price_usd: 10,
+        price_php: 1000,
+        price_usd: 20,
         description: "Tier 1 description",
         is_active: true,
         slot_limit: 1,
