@@ -18,11 +18,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { Spinner } from "./ui/spinner";
 import { cn } from "@/lib/utils";
+import { createCommissionAction } from "@/actions/commission-actions";
 
 const MAX_PAGES = 5
 
 export default function CommissionForm() {
-    const { page, next, prev, hasNext, hasPrev, setPage } = useBasicPagination(MAX_PAGES)
+    const { page, next, prev, hasNext, hasPrev } = useBasicPagination(MAX_PAGES)
     const [isValidatingPage, setIsValidatingPage] = useState(false)
     const form = useForm<FormInput, unknown, FormOutput>({
         resolver: zodResolver(formSchema),
@@ -53,8 +54,11 @@ export default function CommissionForm() {
         }
     })
 
-    const handleSubmit = (data: z.infer<typeof formSchema>) => {
-        console.log(data)
+    const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+        const result = await createCommissionAction(data)
+        if (!result.ok) {
+            return
+        }
     }
 
     const validatePage = useCallback(async () => {
@@ -91,9 +95,6 @@ export default function CommissionForm() {
                 return <CustomerInfoSection />
         }
     }
-
-    console.log("errors", form.formState.errors)
-    console.log("values", form.getValues("image_links"))
 
     return (
         <FormProvider {...form}>

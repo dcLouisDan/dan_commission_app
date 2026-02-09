@@ -22,8 +22,6 @@ The core table storing commission requests and life-cycle data.
 | `is_commercial` | `boolean` | `false` | Commercial rights flag |
 | `priority_level` | `priority_level_enum` | `'STANDARD'` | Priority status |
 | `internal_notes` | `text` | - | Private artist notes (hidden from client) |
-
-
 | **Financials** | | | |
 | `base_price` | `numeric` | - | Starting price |
 | `total_price` | `numeric` | - | Final agreed price |

@@ -31,7 +31,11 @@ export default function SubmissionSummarySection() {
     const { systemSettings } = useSystemSettings()
     const form = useFormContext<FormInput, unknown, FormOutput>()
     const canSubmit = form.formState.isValid && !form.formState.isSubmitting && form.watch("tos_agreed") && form.watch("deposit_agreed")
-    const CommissionSummary = useMemo<CommissionSummary>(() => parseSummary(form.watch(), systemSettings, currency), [form.watch(), systemSettings, currency])
+    const CommissionSummary = useMemo<CommissionSummary>(() => {
+        const summary = parseSummary(form.watch(), systemSettings, currency)
+        form.setValue("cost_summary", summary)
+        return summary
+    }, [form.watch(), systemSettings, currency])
     return (
         <FieldSet>
             <FieldLegend className="text-center">Summary</FieldLegend>

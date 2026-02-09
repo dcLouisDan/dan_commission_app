@@ -55,6 +55,19 @@ export const formSchema = z.object({
     // TOS
     tos_agreed: z.boolean(),
     deposit_agreed: z.boolean(),
+    cost_summary: z.object({
+        base_price: z.number(),
+        addons: z.array(z.object({
+            name: z.string(),
+            price: z.number(),
+        })),
+        subtotal: z.number(),
+        tax: z.number(),
+        xendit_fee: z.number(),
+        rush_fee: z.number(),
+        total: z.number(),
+        deposit: z.number(),
+    })
 }).refine((data) => {
     if (data.social_platform !== "email") {
         return data.social_handle && data.social_handle.length > 0

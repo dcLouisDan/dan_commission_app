@@ -1,3 +1,5 @@
+import { Database } from "./supabase";
+
 export interface CommissionSummary {
     // Cost Breakdown
     base_price: number;
@@ -12,3 +14,7 @@ export interface CommissionSummary {
     total: number;
     deposit: number;
 }
+
+export type CommissionInsert = Database["public"]["Tables"]["commissions"]["Insert"]
+
+export type Commission = Database["public"]["Tables"]["commissions"]["Row"]

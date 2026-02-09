@@ -1,9 +1,9 @@
 import { SystemSettings } from "@/hooks/use-system-settings"
-import { FormInput } from "../validations/commission"
+import { FormInput, FormOutput } from "../validations/commission"
 import { ACCEPTABLE_CURRENCY } from "../constants/app"
 import { CommissionSummary } from "../types/commission"
 
-export function parseSummary(data: FormInput, settings: SystemSettings, currency: typeof ACCEPTABLE_CURRENCY[number] = 'PHP'): CommissionSummary {
+export function parseSummary(data: FormInput | FormOutput, settings: SystemSettings, currency: typeof ACCEPTABLE_CURRENCY[number] = 'PHP'): CommissionSummary {
     const summary: CommissionSummary = {
         base_price: 0,
         addons: [],
