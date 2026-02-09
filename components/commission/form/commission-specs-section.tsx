@@ -10,7 +10,6 @@ import {
     FieldSet,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input";
-import BasicSelect from "@/components/basic-select";
 import { Controller, useFormContext } from "react-hook-form";
 import type { FormInput, FormOutput } from "@/lib/validations/commission";
 import { useTierList } from "@/hooks/use-tier-list";
@@ -20,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import useSystemSettings from "@/hooks/use-system-settings";
 import { useMemo } from "react";
+import CommissionTierGrid from "@/components/commission/form/commission-tier-grid";
 
 export const COMMISSION_SPECS_FIELDS: (keyof FormInput)[] = [
     "commission_type",
@@ -33,7 +33,7 @@ export const COMMISSION_SPECS_FIELDS: (keyof FormInput)[] = [
 
 export default function CommissionSpecsSection() {
     const form = useFormContext<FormInput>()
-    const { tierListOptions, tierListMap } = useTierList()
+    const { tierListMap } = useTierList()
     const { commissionAddons } = useCommissionAddons()
     const { systemSettings } = useSystemSettings()
     const isAddonSelected = (addonId: string, values?: CommissionAddon[]) => {
@@ -60,22 +60,20 @@ export default function CommissionSpecsSection() {
                 name="commission_type"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                    <Field orientation="responsive" className="relative">
+                    <Field orientation="vertical" className="relative">
                         <FieldContent>
                             <FieldLabel>Commission Tier</FieldLabel>
                             <FieldDescription>Choose the tier that best suits your needs.</FieldDescription>
                         </FieldContent>
-                        <BasicSelect
-                            options={tierListOptions}
-                            placeholder={FIELD_PLACEHOLDERS.commission_type}
+
+                        <CommissionTierGrid
                             value={field.value?.id as string}
-                            onValueChange={(value) => {
+                            onChange={(value) => {
                                 const tier = tierListMap.get(value)
                                 if (tier) {
-                                    form.setValue("commission_type", { ...tier })
+                                    field.onChange({ ...tier })
                                 }
                             }}
-                            ariaInvalid={fieldState.invalid}
                         />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} className="absolute -bottom-3 right-0" />}
                     </Field>
