@@ -12,8 +12,30 @@
 - [x] **Cleanup & Layout**
     - [x] Clean up default template (audit `app/page.tsx`, components)
     - [x] Setup global layout / theme (Fonts, Colors from Design System)
-- [ ] **Feature: Commission Form**
-    - [ ] Create simple "Request Commission" page
-    - [ ] Integrate Database Insert (commissions table)
+- [x] **Feature: Commission Form**
+    - [x] Create "Request Commission" page & modular form
+    - [x] Implement Server Actions & Service layer
+    - [x] Integrate Database Insert & Storage uploads
+
+## Active Tasks (Phase 1: Admin & Workflow Operations)
+- [ ] **Admin Command Center (Primary Focus)**
+    - [ ] Create Commissions Dashboard (Overview of all requests)
+    - [ ] Implement detailed Commission View (Review character briefs & images)
+    - [ ] Add "Accept/Reject" logic (Acceptance triggers next workflow)
+    - [ ] Add "Status Management" (Pending -> Accepted -> Deposit Paid -> In Progress)
+- [ ] **Asset Management & Delivery**
+    - [ ] Create "Asset Upload" page for Admin
+    - [ ] Setup "Artifacts" table/storage for final high-res delivery
+    - [ ] Implement secure download logic for clients (Post-Final Payment)
+
+## Active Tasks (Phase 2: Payments & Notifications)
+- [ ] **Refined Payment Flow (Xendit)**
+    - [ ] Core: Generate Xendit Invoice *only* upon Admin Approval
+    - [ ] Setup Webhook listener for "Paid" status sync
+    - [ ] Refund/Cancel logic
+- [ ] **Communication & Verification**
+    - [ ] Implement Email Receipt system (resend-based or similar)
+    - [ ] Add Email Verification for new clients (Magic Link or OTP)
+    - [ ] Automatic status update notifications (e.g., "Your commission was accepted!")
 
 ## Completed Tasks

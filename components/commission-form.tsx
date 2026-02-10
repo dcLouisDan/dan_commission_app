@@ -15,12 +15,21 @@ import SubmissionSummarySection from "./commission/form/submission-summary-secti
 import useBasicPagination from "@/hooks/use-basic-pagination";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Spinner } from "./ui/spinner";
 import { cn } from "@/lib/utils";
 import { createCommissionAction } from "@/actions/commission-actions";
+import { toast } from "sonner";
 
 const MAX_PAGES = 5
+
+const PAGE_FIELDS = {
+    1: CUSTOMER_INFO_FIELDS,
+    2: COMMISSION_SPECS_FIELDS,
+    3: CREATIVE_BRIEF_FIELDS,
+    4: REFERENCE_IMAGES_FIELDS,
+    5: []
+}
 
 export default function CommissionForm() {
     const { page, next, prev, hasNext, hasPrev } = useBasicPagination(MAX_PAGES)
@@ -57,26 +66,19 @@ export default function CommissionForm() {
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
         const result = await createCommissionAction(data)
         if (!result.ok) {
+            toast.error(result.error.message)
             return
         }
+        toast.success("Commission created successfully")
+        form.reset()
     }
 
     const validatePage = useCallback(async () => {
         setIsValidatingPage(true)
-        switch (page) {
-            case 1:
-                return await form.trigger(CUSTOMER_INFO_FIELDS)
-            case 2:
-                return await form.trigger(COMMISSION_SPECS_FIELDS)
-            case 3:
-                return await form.trigger(CREATIVE_BRIEF_FIELDS)
-            case 4:
-                return await form.trigger(REFERENCE_IMAGES_FIELDS)
-            case 5:
-                return form.formState.isValid
-            default:
-                return false
+        if (page === MAX_PAGES) {
+            return form.formState.isValid
         }
+        return await form.trigger(PAGE_FIELDS[page as keyof typeof PAGE_FIELDS])
     }, [page, form])
 
     const getSection = () => {

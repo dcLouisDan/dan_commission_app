@@ -1,7 +1,11 @@
 import { insertCommission } from "../repositories/commission-repo";
+import { deleteFiles, uploadMultipleFiles } from "../repositories/storage-repo";
 import { Commission, CommissionInsert } from "../types/commission";
-import { ServiceResult } from "../types/response";
+import { ServiceResult, StorageSummary } from "../types/response";
+import { formatClientName } from "../utils/string-utils";
 import { FormOutput } from "../validations/commission";
+
+const BUCKET_NAME = process.env.NEXT_COMMISSION_REFERENCE_BUCKET ?? "commission_reference_images";
 
 export async function createCommission(formData: FormOutput): Promise<ServiceResult<Commission>> {
     const { commission_type,
@@ -43,10 +47,19 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     }
 
     let referenceImages: string[] = []
+    let uploadedImages: string[] = []
     if (image_submit_option === "google_drive_folder" && google_drive_folder) {
         referenceImages.push(google_drive_folder)
     } else if (image_submit_option === "direct_upload" && direct_upload_images) {
-        // logic for supabase storage upload
+        const timestamp = Date.now();
+        const formattedClientName = formatClientName(client_name)
+        const folderName = `${timestamp}_${formattedClientName}`
+        const result = await uploadReferenceImages(direct_upload_images, folderName)
+        if (!result.ok) {
+            return { ok: false, error: { type: "storage", message: result.error.message } }
+        }
+        uploadedImages = result.data!.success_files
+        referenceImages = result.data!.success_public_urls || []
     } else if (image_submit_option === "image_links" && image_links) {
         referenceImages = image_links
     }
@@ -100,7 +113,27 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     try {
         const result = await insertCommission(commissionInsert)
         if (!result.ok) {
+            if (uploadedImages.length > 0) {
+                await deleteFiles(uploadedImages, BUCKET_NAME)
+            }
+
             return { ok: false, error: { type: "database", message: result.error.raw.message } }
+        }
+        return { ok: true, data: result.data! }
+    } catch (error) {
+        const err = error as Error
+        if (uploadedImages.length > 0) {
+            await deleteFiles(uploadedImages, BUCKET_NAME)
+        }
+        return { ok: false, error: { type: "unknown", message: err.message } }
+    }
+}
+
+async function uploadReferenceImages(files: File[], folderName: string): Promise<ServiceResult<StorageSummary>> {
+    try {
+        const result = await uploadMultipleFiles(files, BUCKET_NAME, folderName)
+        if (!result.ok) {
+            return { ok: false, error: { type: "storage", message: result.error.raw.message } }
         }
         return { ok: true, data: result.data! }
     } catch (error) {
