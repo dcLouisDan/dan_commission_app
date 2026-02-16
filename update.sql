@@ -141,3 +141,46 @@ create policy "Public can view own commission"
   on commissions for select
   using (true);
 
+
+-- ==========================================
+-- NEWLY ADDED: Admin Panel Access (Authenticated Users)
+-- ==========================================
+
+-- Commissions
+drop policy if exists "Admins have full access to commissions" on commissions;
+create policy "Admins have full access to commissions"
+  on commissions for all to authenticated using (true) with check (true);
+
+-- Tiers
+drop policy if exists "Admins have full access to tiers" on commission_tiers;
+create policy "Admins have full access to tiers"
+  on commission_tiers for all to authenticated using (true) with check (true);
+
+-- Addons
+drop policy if exists "Admins have full access to addons" on commission_addons;
+create policy "Admins have full access to addons"
+  on commission_addons for all to authenticated using (true) with check (true);
+
+-- Settings
+drop policy if exists "Admins have full access to settings" on system_settings;
+create policy "Admins have full access to settings"
+  on system_settings for all to authenticated using (true) with check (true);
+
+-- CMS
+drop policy if exists "Admins have full access to portfolio" on portfolio_items;
+create policy "Admins have full access to portfolio"
+  on portfolio_items for all to authenticated using (true) with check (true);
+
+drop policy if exists "Admins have full access to posts" on posts;
+create policy "Admins have full access to posts"
+  on posts for all to authenticated using (true) with check (true);
+
+-- Logs
+drop policy if exists "Admins can view activity logs" on activity_logs;
+create policy "Admins can view activity logs"
+  on activity_logs for select to authenticated using (true);
+
+drop policy if exists "Admins can view webhook logs" on webhooks_log;
+create policy "Admins can view webhook logs"
+  on webhooks_log for select to authenticated using (true);
+

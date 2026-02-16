@@ -16,10 +16,14 @@
     - [x] Create "Request Commission" page & modular form
     - [x] Implement Server Actions & Service layer
     - [x] Integrate Database Insert & Storage uploads
+    - [ ] Integration: Fetch live Tiers from DB (Replace Mock Data)
+    - [ ] Integration: Fetch live Addons from DB (Replace Mock Data)
 
 ## Active Tasks (Phase 1: Admin & Workflow Operations)
 - [ ] **Admin Command Center (Primary Focus)**
     - [ ] Create Commissions Dashboard (Overview of all requests)
+    - [ ] Create Inventory Management: Commission Tiers editor
+    - [ ] Create Inventory Management: Commission Addons editor
     - [ ] Implement detailed Commission View (Review character briefs & images)
     - [ ] Add "Accept/Reject" logic (Acceptance triggers next workflow)
     - [ ] Add "Status Management" (Pending -> Accepted -> Deposit Paid -> In Progress)

@@ -200,7 +200,49 @@ create policy "Public can view published posts"
   on posts for select
   using (is_published = true);
 
--- Admin Access Logs (Example placeholder)
--- create policy "Admins can view activity logs"
---   on activity_logs for select
---   using (auth.uid() = 'admin_uuid_here');
+-- Admin Access (Full CRUD for all tables)
+create policy "Admins have full access to commissions"
+  on commissions for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to tiers"
+  on commission_tiers for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to addons"
+  on commission_addons for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to settings"
+  on system_settings for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to portfolio"
+  on portfolio_items for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to posts"
+  on posts for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins can view activity logs"
+  on activity_logs for select
+  to authenticated
+  using (true);
+
+create policy "Admins can view webhook logs"
+  on webhooks_log for select
+  to authenticated
+  using (true);
