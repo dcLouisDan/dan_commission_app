@@ -15,7 +15,7 @@ import SubmissionSummarySection from "./commission/form/submission-summary-secti
 import useBasicPagination from "@/hooks/use-basic-pagination";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { Spinner } from "./ui/spinner";
 import { cn } from "@/lib/utils";
 import { createCommissionAction } from "@/actions/commission-actions";
@@ -55,9 +55,9 @@ export default function CommissionForm() {
             character_setting: "",
             character_lighting: "",
             image_submit_option: IMAGE_SUBMIT_OPTIONS[0],
-            google_drive_folder: undefined,
-            direct_upload_images: undefined,
-            image_links: undefined,
+            google_drive_folder: "",
+            direct_upload_images: [],
+            image_links: [],
             tos_agreed: false,
             deposit_agreed: false,
         }
@@ -92,11 +92,14 @@ export default function CommissionForm() {
             case 4:
                 return <ReferenceImagesSection />
             case 5:
-                return <SubmissionSummarySection />
+                return <Suspense fallback={<Spinner />}>
+                    <SubmissionSummarySection />
+                </Suspense>
             default:
                 return <CustomerInfoSection />
         }
     }
+    console.log(form.formState.errors)
 
     return (
         <FormProvider {...form}>

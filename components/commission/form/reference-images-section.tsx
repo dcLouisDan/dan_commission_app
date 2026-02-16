@@ -74,7 +74,7 @@ export default function ReferenceImagesSection() {
                             <Field className="border bg-card p-4 rounded-md">
                                 <FieldLabel><FolderOpen className="inline w-4 h-4" /> Google Drive Folder Link</FieldLabel>
                                 <FieldDescription>{FIELD_PLACEHOLDERS.google_drive_folder}</FieldDescription>
-                                <Input placeholder="https://drive.google.com/drive/folders/your-folder-id" {...field} />
+                                <Input placeholder="https://drive.google.com/drive/folders/your-folder-id" {...field} value={(field.value as string) ?? ""} />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
@@ -89,13 +89,32 @@ export default function ReferenceImagesSection() {
                                         <FieldLabel><LinkIcon className="inline w-4 h-4" /> Image Links</FieldLabel>
                                         <FieldDescription>{FIELD_PLACEHOLDERS.image_links}</FieldDescription>
                                     </div>
-                                    <Button className="shrink-0" variant="secondary" type="button" size="icon" onClick={() => field.onChange([...(field.value || []), ""])}><Plus className="w-4 h-4" /></Button>
+                                    <Button className="shrink-0" variant="secondary" type="button" size="icon" onClick={() => field.onChange([...(field.value as Array<string> || []), ""])}><Plus className="w-4 h-4" /></Button>
                                 </div>
                                 {
-                                    Array.from({ length: form.watch("image_links")?.length || 1 }).map((_, index) => (
+                                    (Array.isArray(field.value) ? field.value : [""]).map((link: string, index: number) => (
                                         <div key={index} className="flex items-center gap-2">
-                                            <Input placeholder="https://image.com/image.jpg" value={field.value?.[index]} onChange={(e) => field.onChange(field.value?.map((link, i) => i === index ? e.target.value : link))} />
-                                            <Button disabled={form.watch("image_links")?.length === 1} variant="ghost" type="button" size="icon" onClick={() => field.onChange(field.value?.filter((_, i) => i !== index))}><Trash2 className="w-4 h-4" /></Button>
+                                            <Input
+                                                placeholder="https://image.com/image.jpg"
+                                                value={link}
+                                                onChange={(e) => {
+                                                    const currentLinks = Array.isArray(field.value) ? [...field.value] : [""];
+                                                    currentLinks[index] = e.target.value;
+                                                    field.onChange(currentLinks);
+                                                }}
+                                            />
+                                            <Button
+                                                disabled={(Array.isArray(field.value) ? field.value.length : 1) === 1}
+                                                variant="ghost"
+                                                type="button"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const currentLinks = Array.isArray(field.value) ? field.value : [""];
+                                                    field.onChange(currentLinks.filter((_, i) => i !== index));
+                                                }}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
                                         </div>
                                     ))
                                 }

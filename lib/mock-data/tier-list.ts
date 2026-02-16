@@ -4,7 +4,7 @@ const THUMBNAIL_URL = "https://picsum.photos/400/500"
 
 export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['Row'][] = [
     {
-        id: "1",
+        id: "550e8400-e29b-41d4-a716-446655440000",
         category: "Tier 1",
         price_php: 1000,
         price_usd: 20,
@@ -16,7 +16,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "2",
+        id: "550e8400-e29b-41d4-a716-446655440001",
         category: "Tier 2",
         price_php: 20,
         price_usd: 20,
@@ -28,7 +28,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "3",
+        id: "550e8400-e29b-41d4-a716-446655440002",
         category: "Tier 3",
         price_php: 30,
         price_usd: 30,
@@ -40,7 +40,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "4",
+        id: "550e8400-e29b-41d4-a716-446655440003",
         category: "Tier 4",
         price_php: 40,
         price_usd: 40,
@@ -52,7 +52,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "5",
+        id: "550e8400-e29b-41d4-a716-446655440004",
         category: "Tier 5",
         price_php: 50,
         price_usd: 50,
@@ -64,7 +64,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "6",
+        id: "550e8400-e29b-41d4-a716-446655440005",
         category: "Tier 6",
         price_php: 60,
         price_usd: 60,
@@ -76,7 +76,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "7",
+        id: "550e8400-e29b-41d4-a716-446655440006",
         category: "Tier 7",
         price_php: 70,
         price_usd: 70,
@@ -88,7 +88,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "8",
+        id: "550e8400-e29b-41d4-a716-446655440007",
         category: "Tier 8",
         price_php: 80,
         price_usd: 80,
@@ -100,7 +100,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "9",
+        id: "550e8400-e29b-41d4-a716-446655440008",
         category: "Tier 9",
         price_php: 90,
         price_usd: 90,
@@ -112,7 +112,7 @@ export const MOCK_TIER_LIST: Database['public']['Tables']['commission_tiers']['R
         created_at: '2026-02-02T14:32:59.000Z',
     },
     {
-        id: "10",
+        id: "550e8400-e29b-41d4-a716-446655440009",
         category: "Tier 10",
         price_php: 100,
         price_usd: 100,

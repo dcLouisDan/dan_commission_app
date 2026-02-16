@@ -15,7 +15,7 @@ export default function CommissionTierGrid({
     const { tiers } = useTierList()
     return (
         <div className="border rounded-md p-2 bg-card grid-cols-2">
-            <RadioGroup value={value} onValueChange={onChange} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            <RadioGroup value={value ?? ""} onValueChange={onChange} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {tiers.map((tier) => (
                     <TierCard
                         key={tier.id}

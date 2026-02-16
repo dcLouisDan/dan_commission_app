@@ -120,3 +120,24 @@ create policy "Public can view active tiers"
   on commission_tiers for select
   using (is_active = true);
 
+
+-- ==========================================
+-- NEWLY ADDED: Public Submission & Portal Access
+-- ==========================================
+
+-- 1. Enable RLS on commissions (in case not already enabled)
+alter table commissions enable row level security;
+
+-- 2. Allow public to insert commissions (Submitting the form)
+drop policy if exists "Public can submit commissions" on commissions;
+create policy "Public can submit commissions"
+  on commissions for insert
+  with check (true);
+
+-- 3. Allow public to view commissions (Portal Access)
+-- This relies on the knowledge of the portal_slug/ID.
+drop policy if exists "Public can view own commission" on commissions;
+create policy "Public can view own commission"
+  on commissions for select
+  using (true);
+

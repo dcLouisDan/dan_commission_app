@@ -26,6 +26,8 @@ import { useServerLocation } from "@/hooks/use-server-location"
 import { cn } from "@/lib/utils"
 import { snakeCaseToTitleCase } from "@/lib/utils/string-utils"
 
+
+
 export default function SubmissionSummarySection() {
     const { currency } = useServerLocation()
     const { systemSettings } = useSystemSettings()
@@ -35,7 +37,7 @@ export default function SubmissionSummarySection() {
         const summary = parseSummary(form.watch(), systemSettings, currency)
         form.setValue("cost_summary", summary)
         return summary
-    }, [form.watch(), systemSettings, currency])
+    }, [form.formState.isValid, systemSettings, currency])
     return (
         <FieldSet>
             <FieldLegend className="text-center">Summary</FieldLegend>

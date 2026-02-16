@@ -49,8 +49,8 @@ export const formSchema = z.object({
     character_setting: z.string().min(1, "Character setting is required"),
     character_lighting: z.string().min(1, "Character lighting is required"),
     image_submit_option: z.enum(IMAGE_SUBMIT_OPTIONS).default("direct_upload"),
-    google_drive_folder: z.preprocess((val: string) => val.trim().length > 0 ? val : undefined, z.url("Invalid google drive folder url")).optional(),
-    image_links: z.preprocess((val: string[]) => val.filter((link) => link.trim().length > 0), z.array(z.url("Invalid image link"))).optional(),
+    google_drive_folder: z.preprocess((val) => (val === "" ? undefined : val), z.url("Invalid google drive folder url").optional()),
+    image_links: z.preprocess((val) => (Array.isArray(val) ? val.filter((link) => link.trim().length > 0) : val), z.array(z.url("Invalid image link")).optional()),
     direct_upload_images: z.array(imageSchema).optional(),
     // TOS
     tos_agreed: z.boolean(),

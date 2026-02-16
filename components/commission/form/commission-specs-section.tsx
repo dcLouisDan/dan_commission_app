@@ -67,7 +67,7 @@ export default function CommissionSpecsSection() {
                         </FieldContent>
 
                         <CommissionTierGrid
-                            value={field.value?.id as string}
+                            value={field.value?.id ?? ""}
                             onChange={(value) => {
                                 const tier = tierListMap.get(value)
                                 if (tier) {

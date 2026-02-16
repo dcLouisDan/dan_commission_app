@@ -177,6 +177,15 @@ create policy "Public can view active addons"
   on commission_addons for select
   using (is_active = true);
 
+-- Public Submit & View Commission (via Portal Slug)
+create policy "Public can submit commissions"
+  on commissions for insert
+  with check (true);
+
+create policy "Public can view own commission"
+  on commissions for select
+  using (true); -- Relies on portal_slug being a secret URL
+
 -- Public Read Settings
 create policy "Public can view settings"
   on system_settings for select
