@@ -20,6 +20,10 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavConfig = {
             url: "/admin/gallery",
         },
         {
+            title: "Commission Tiers",
+            url: "/admin/commission-tiers",
+        },
+        {
             title: "Blog",
             url: "/admin/blog",
         },

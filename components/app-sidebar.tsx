@@ -24,6 +24,7 @@ import {
 import AppLogo from "./app-logo"
 import { SIDEBAR_NAV_ITEMS } from "@/lib/constants/app"
 import { SidebarNavItem } from "@/lib/types/ui"
+import Link from "next/link"
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -52,8 +53,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   {item.items?.length ? (
                     <SidebarCollabsibleItem item={item} />
                   ) : (
-                    <SidebarMenuButton>
-                      {item.title}
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        {item.title}
+                      </Link>
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>

@@ -1,6 +1,6 @@
 "use client"
 import { Plus, Upload, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDropzone } from 'react-dropzone'
 import ImageWithPreview from "./image-with-preview";
 
