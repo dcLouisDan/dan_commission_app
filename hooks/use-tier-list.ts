@@ -1,8 +1,7 @@
 import { MOCK_TIER_LIST } from "@/lib/mock-data/tier-list";
-import { Database } from "@/lib/types/supabase";
+import { CommissionTier } from "@/lib/types/commission-tier";
 import { rowsToSelectItems } from "@/lib/utils/row-utils";
 
-export type CommissionTier = Database['public']['Tables']['commission_tiers']['Row']
 
 export function useTierList() {
     const tierListOptions = rowsToSelectItems(MOCK_TIER_LIST, "id", "category", (tier) => tier.category! + " - " + tier.variant!)
