@@ -10,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "../ui/textarea"
 import BasicImageInput from "../basic-image-input"
 import { Button } from "../ui/button"
+import { createCommissionTier } from "@/lib/services/commission-tier-service"
+import { toast } from "sonner"
 
 
 const FIELD_PLACEHOLDERS = {
@@ -28,8 +30,13 @@ export default function CommissionTierForm() {
         resolver: zodResolver(formSchema),
     })
 
-    const handleSubmit = (data: FormOutput) => {
-        console.log(data)
+    const handleSubmit = async (data: FormOutput) => {
+        const result = await createCommissionTier(data)
+        if (!result.ok && result.error) {
+            toast.error(result.error.message)
+            return
+        }
+        form.reset()
     }
 
     const canSubmit = form.formState.isValid && form.formState.isDirty;

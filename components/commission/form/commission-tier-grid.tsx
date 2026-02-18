@@ -1,9 +1,9 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { CommissionTier, useTierList } from "@/hooks/use-tier-list";
+import { useTierList } from "@/hooks/use-tier-list";
 import { Field, FieldContent, FieldDescription, FieldLabel, FieldTitle } from "@/components/ui/field";
 import ImageWithPreview from "@/components/image-with-preview";
 import { useServerLocation } from "@/hooks/use-server-location";
+import { CommissionTier } from "@/lib/types/commission-tier";
 
 export default function CommissionTierGrid({
     value,
