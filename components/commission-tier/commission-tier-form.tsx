@@ -10,8 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "../ui/textarea"
 import BasicImageInput from "../basic-image-input"
 import { Button } from "../ui/button"
-import { createCommissionTier } from "@/lib/services/commission-tier-service"
+import { createCommissionTier, editCommissionTier } from "@/lib/services/commission-tier-service"
 import { toast } from "sonner"
+import { CommissionTier } from "@/lib/types/commission-tier"
+import { createCommissionTierAction, editCommissionTierAction } from "@/actions/commission-tier-actions"
 
 
 const FIELD_PLACEHOLDERS = {
@@ -25,21 +27,41 @@ const FIELD_PLACEHOLDERS = {
     slot_limit: "Slot Limit"
 }
 
-export default function CommissionTierForm() {
+export default function CommissionTierForm({ intent = "create", commissionTier }: { intent: "create" | "update", commissionTier?: CommissionTier }) {
     const form = useForm<FormInput, unknown, FormOutput>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            category: commissionTier?.category ?? "",
+            variant: commissionTier?.variant ?? "",
+            description: commissionTier?.description ?? "",
+            is_active: commissionTier?.is_active ?? true,
+            price_php: commissionTier?.price_php?.toString() ?? "0",
+            price_usd: commissionTier?.price_usd?.toString() ?? "0",
+            slot_limit: commissionTier?.slot_limit?.toString() ?? "0",
+        }
     })
 
     const handleSubmit = async (data: FormOutput) => {
-        const result = await createCommissionTier(data)
-        if (!result.ok && result.error) {
-            toast.error(result.error.message)
-            return
+        if (intent === "create") {
+            const result = await createCommissionTierAction(data)
+            if (!result.ok && result.error) {
+                toast.error(result.error.message)
+                return
+            }
+            toast.success("Commission tier created successfully")
+        } else {
+            const result = await editCommissionTierAction(data, commissionTier!)
+            if (!result.ok && result.error) {
+                toast.error(result.error.message)
+                return
+            }
+            toast.success("Commission tier updated successfully")
         }
         form.reset()
     }
 
-    const canSubmit = form.formState.isValid && form.formState.isDirty;
+    const canSubmit = form.formState.isDirty;
+    console.log(form.formState.errors)
     return (
         <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">
@@ -49,7 +71,7 @@ export default function CommissionTierForm() {
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field className="h-full">
-                                <BasicImageInput image={field.value} setImage={field.onChange} />
+                                <BasicImageInput image={field.value} setImage={field.onChange} defaultPreviewSrc={commissionTier?.thumbnail_url} />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

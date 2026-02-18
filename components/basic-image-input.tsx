@@ -6,8 +6,8 @@ import { useMemo } from "react";
 import { useDropzone } from 'react-dropzone'
 import ImageWithPreview from "./image-with-preview";
 
-export default function BasicImageInput({ image, setImage }: { image: File | null, setImage: (image: File | null) => void }) {
-    const imagePreviewUrl = useMemo(() => image ? URL.createObjectURL(image) : null, [image]);
+export default function BasicImageInput({ image, setImage, defaultPreviewSrc }: { image: File | null, setImage: (image: File | null) => void, defaultPreviewSrc?: string | null }) {
+    const imagePreviewUrl = useMemo(() => image ? URL.createObjectURL(image) : defaultPreviewSrc, [image, defaultPreviewSrc]);
     const onDrop = useMemo(() => {
         return (acceptedFiles: File[]) => {
             const file = acceptedFiles[0]
