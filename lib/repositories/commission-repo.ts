@@ -2,10 +2,12 @@ import { createClient } from "../supabase/server";
 import { Commission, CommissionInsert } from "../types/commission";
 import { DbResult } from "../types/response";
 
+export const COMMISSIONS_TABLE = "commissions"
+
 export async function insertCommission(data: CommissionInsert): Promise<DbResult<Commission | null>> {
     const supabase = await createClient()
     try {
-        const { error, data: commission } = await supabase.from("commissions").insert([data]).select("*").single()
+        const { error, data: commission } = await supabase.from(COMMISSIONS_TABLE).insert([data]).select("*").single()
 
         if (error) {
             return { ok: false, error: { type: "database", raw: error } }

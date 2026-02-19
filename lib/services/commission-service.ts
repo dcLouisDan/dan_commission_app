@@ -5,7 +5,7 @@ import { ServiceResult, StorageSummary } from "../types/response";
 import { formatClientName } from "../utils/string-utils";
 import { FormOutput } from "../validations/commission";
 
-const BUCKET_NAME = process.env.NEXT_COMMISSION_REFERENCE_BUCKET ?? "commission_reference_images";
+export const COMMISSION_REFERENCE_IMAGES_BUCKET = process.env.NEXT_COMMISSION_REFERENCE_BUCKET ?? "commission_reference_images";
 
 export async function createCommission(formData: FormOutput): Promise<ServiceResult<Commission>> {
     const { commission_type,
@@ -114,7 +114,7 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
         const result = await insertCommission(commissionInsert)
         if (!result.ok) {
             if (uploadedImages.length > 0) {
-                await deleteFiles(uploadedImages, BUCKET_NAME)
+                await deleteFiles(uploadedImages, COMMISSION_REFERENCE_IMAGES_BUCKET)
             }
 
             return { ok: false, error: { type: "database", message: result.error.raw.message } }
@@ -123,7 +123,7 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     } catch (error) {
         const err = error as Error
         if (uploadedImages.length > 0) {
-            await deleteFiles(uploadedImages, BUCKET_NAME)
+            await deleteFiles(uploadedImages, COMMISSION_REFERENCE_IMAGES_BUCKET)
         }
         return { ok: false, error: { type: "unknown", message: err.message } }
     }
@@ -131,7 +131,7 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
 
 async function uploadReferenceImages(files: File[], folderName: string): Promise<ServiceResult<StorageSummary>> {
     try {
-        const result = await uploadMultipleFiles(files, BUCKET_NAME, folderName)
+        const result = await uploadMultipleFiles(files, COMMISSION_REFERENCE_IMAGES_BUCKET, folderName)
         if (!result.ok) {
             return { ok: false, error: { type: "storage", message: result.error.raw.message } }
         }
