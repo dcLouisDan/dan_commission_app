@@ -253,6 +253,77 @@ export type Database = {
           },
         ]
       }
+      file_relations: {
+        Row: {
+          created_at: string | null
+          file_id: string
+          id: string
+          related_id: string
+          related_table: string
+          relation_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          file_id: string
+          id?: string
+          related_id: string
+          related_table: string
+          relation_type: string
+        }
+        Update: {
+          created_at?: string | null
+          file_id?: string
+          id?: string
+          related_id?: string
+          related_table?: string
+          relation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_relations_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          bucket_id: string
+          content_type: string | null
+          created_at: string | null
+          filename: string
+          id: string
+          is_public: boolean | null
+          metadata: Json | null
+          size_bytes: number | null
+          storage_path: string
+        }
+        Insert: {
+          bucket_id: string
+          content_type?: string | null
+          created_at?: string | null
+          filename: string
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          size_bytes?: number | null
+          storage_path: string
+        }
+        Update: {
+          bucket_id?: string
+          content_type?: string | null
+          created_at?: string | null
+          filename?: string
+          id?: string
+          is_public?: boolean | null
+          metadata?: Json | null
+          size_bytes?: number | null
+          storage_path?: string
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           created_at: string | null

@@ -156,6 +156,28 @@ create table webhooks_log (
   processed boolean default false
 );
 
+-- 7. Storage File Tracking
+create table files (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamptz default now(),
+  filename text not null,
+  storage_path text not null unique,
+  bucket_id text not null,
+  content_type text,
+  size_bytes bigint,
+  metadata jsonb default '{}'::jsonb,
+  is_public boolean default false
+);
+
+create table file_relations (
+  id uuid primary key default uuid_generate_v4(),
+  file_id uuid not null references files(id) on delete cascade,
+  related_table text not null,
+  related_id uuid not null,
+  relation_type text not null,
+  created_at timestamptz default now()
+);
+
 -- RLS
 alter table commissions enable row level security;
 alter table commission_tiers enable row level security;
@@ -165,6 +187,8 @@ alter table portfolio_items enable row level security;
 alter table posts enable row level security;
 alter table activity_logs enable row level security;
 alter table webhooks_log enable row level security;
+alter table files enable row level security;
+alter table file_relations enable row level security;
 
 -- Policies
 
@@ -246,3 +270,24 @@ create policy "Admins can view webhook logs"
   on webhooks_log for select
   to authenticated
   using (true);
+
+-- Storage File Tracking
+create policy "Admins have full access to files"
+  on files for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Admins have full access to file_relations"
+  on file_relations for all
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Public can view public files"
+  on files for select
+  using (is_public = true);
+
+create policy "Public can view file relations"
+  on file_relations for select
+  using (true); -- Relations themselves aren't sensitive if the file isn't

@@ -81,3 +81,23 @@ For a "Personal Art Commission Platform," the scale is low-volume, high-value. W
 
 ## Architecture Consideration
 - **Webhook-First:** The source of truth for "Paid" status is the Webhook, not the frontend redirect. The frontend should poll or listen to the DB status after redirecting back.
+
+---
+
+## File Tracking & Edge Functions Plan
+
+### 1. Unified File Tracking
+Instead of storing raw URLs everywhere, we will use a `files` table to track Storage assets.
+- **Why?** Allows us to manage lifecycle (delete from storage when record is deleted), track disk usage, and attach metadata.
+- **Polymorphic Relations:** The `file_relations` table (Pivot) allows a single file to be reused (e.g., a "Terms of Service" PDF linked to multiple commissions) or multiple files for one record (e.g., multiple "Reference Images" for one commission).
+- **Flexibility:** Existing tables like `commissions` can keep their `reference_images` (JSONB) or `thumbnail_url` for external links, but we can *also* link them via the pivot table for internal storage tracking.
+
+### 2. Edge Functions Strategy
+- **Image Optimization:** Trigger an Edge Function on `files` insert to generate thumbnails or watermark delivery files.
+- **Security:** Use Edge Functions to generate signed URLs for private files (e.g. `commissions/delivery/`) only when requested by the authorized portal.
+- **Cleanup:** Trigger an Edge Function to delete physical files from Supabase Storage when a `files` record is deleted.
+
+### Action Plan
+1. **Migration:** Create `files` and `file_relations` tables.
+2. **Repository:** Update `StorageRepo` to also insert into `files` table upon successful Supabase Storage upload.
+3. **Logic:** Implement a `LinkFile` service that manages the `file_relations` entries.

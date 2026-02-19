@@ -109,7 +109,33 @@ Blog/Devlog updates.
 | `is_published` | `boolean` | `false` | Draft status |
 | `published_at` | `timestamptz` | - | Public date |
 
-### 7. `activity_logs` & `webhooks_log`
+### 7. `files`
+Tracks files uploaded to Supabase Storage.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
+| `created_at` | `timestamptz` | `now()` | - |
+| `filename` | `text` | - | Original filename |
+| `storage_path` | `text` | - | Path within bucket (e.g. `commissions/xyz.png`) |
+| `bucket_id` | `text` | - | Supabase Storage bucket name |
+| `content_type` | `text` | - | MIME type |
+| `size_bytes` | `bigint` | - | File size |
+| `metadata` | `jsonb` | `{}` | Extra data (dimensions, etc.) |
+| `is_public` | `boolean` | `false` | Access level |
+
+### 8. `file_relations` (Polymorphic Pivot)
+Links files to other records.
+
+| Column | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` | `uuid_generate_v4()` | Primary Key |
+| `file_id` | `uuid` | - | References `files.id` |
+| `related_table` | `text` | - | e.g. `'commissions'`, `'posts'` |
+| `related_id` | `uuid` | - | ID of the record in `related_table` |
+| `relation_type` | `text` | - | e.g. `'reference'`, `'delivery'`, `'thumbnail'` |
+
+### 9. `activity_logs` & `webhooks_log`
 (See existing schema)
 
 ---
