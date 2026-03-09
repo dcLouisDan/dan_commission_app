@@ -1,3 +1,4 @@
+import { COMMISSION_REFERENCE_IMAGES_BUCKET } from "../constants/files";
 import { insertCommission } from "../repositories/commission-repo";
 import { deleteFiles, uploadMultipleFiles } from "../repositories/storage-repo";
 import { Commission, CommissionInsert } from "../types/commission";
@@ -5,7 +6,6 @@ import { ServiceResult, StorageSummary } from "../types/response";
 import { formatClientName } from "../utils/string-utils";
 import { FormOutput } from "../validations/commission";
 
-export const COMMISSION_REFERENCE_IMAGES_BUCKET = process.env.NEXT_COMMISSION_REFERENCE_BUCKET ?? "commission_reference_images";
 
 export async function createCommission(formData: FormOutput): Promise<ServiceResult<Commission>> {
     const { commission_type,
@@ -51,15 +51,15 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     if (image_submit_option === "google_drive_folder" && google_drive_folder) {
         referenceImages.push(google_drive_folder)
     } else if (image_submit_option === "direct_upload" && direct_upload_images) {
-        const timestamp = Date.now();
-        const formattedClientName = formatClientName(client_name)
-        const folderName = `${timestamp}_${formattedClientName}`
-        const result = await uploadReferenceImages(direct_upload_images, folderName)
-        if (!result.ok) {
-            return { ok: false, error: { type: "storage", message: result.error.message } }
-        }
-        uploadedImages = result.data!.success_files
-        referenceImages = result.data!.success_public_urls || []
+        // const timestamp = Date.now();
+        // const formattedClientName = formatClientName(client_name)
+        // const folderName = `${timestamp}_${formattedClientName}`
+        // const result = await uploadReferenceImages(direct_upload_images, folderName)
+        // if (!result.ok) {
+        //     return { ok: false, error: { type: "storage", message: result.error.message } }
+        // }
+        // uploadedImages = result.data!.success_files
+        // referenceImages = result.data!.success_public_urls || []
     } else if (image_submit_option === "image_links" && image_links) {
         referenceImages = image_links
     }

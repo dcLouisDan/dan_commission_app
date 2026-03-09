@@ -1,9 +1,9 @@
+import { ADMIN_IMAGES_BUCKET } from "../constants/files";
 import { insertCommissionTier, updateCommissionTier } from "../repositories/commission-tier-repo";
 import { deleteFiles, uploadFile } from "../repositories/storage-repo";
 import { CommissionTier, CommissionTierInsert } from "../types/commission-tier";
 import { FormOutput } from "../validations/commission-tier";
 
-export const ADMIN_IMAGES_BUCKET = process.env.NEXT_ADMIN_IMAGES_BUCKET ?? "admin_images";
 const FOLDER_NAME = "commission_tiers";
 
 export async function createCommissionTier(data: FormOutput) {

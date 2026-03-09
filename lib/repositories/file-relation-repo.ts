@@ -1,11 +1,11 @@
-import { createClient } from "../supabase/client";
+import { FILE_RELATION_TABLE } from "../constants/files";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "../types/supabase";
 import { FileRelationInsert, FileRelation, FileRelationUpdate, FileRelatedTable } from "../types/file-relation";
 import { DbResult } from "../types/response";
 
-export const FILE_RELATION_TABLE = 'file_relations';
 
-export async function insertFileRelation(fileRelation: FileRelationInsert): Promise<DbResult<FileRelation | null>> {
-    const supabase = createClient()
+export async function insertFileRelation(supabase: SupabaseClient<Database>, fileRelation: FileRelationInsert): Promise<DbResult<FileRelation | null>> {
     try {
         const { data, error } = await supabase
             .from(FILE_RELATION_TABLE)
@@ -23,8 +23,7 @@ export async function insertFileRelation(fileRelation: FileRelationInsert): Prom
     }
 }
 
-export async function deleteFileRelation(id: string): Promise<DbResult<null>> {
-    const supabase = createClient()
+export async function deleteFileRelation(supabase: SupabaseClient<Database>, id: string): Promise<DbResult<null>> {
     try {
         const { error } = await supabase
             .from(FILE_RELATION_TABLE)
@@ -41,8 +40,7 @@ export async function deleteFileRelation(id: string): Promise<DbResult<null>> {
     }
 }
 
-export async function updateFileRelation(fileRelation: FileRelationUpdate, id: string): Promise<DbResult<FileRelation | null>> {
-    const supabase = createClient()
+export async function updateFileRelation(supabase: SupabaseClient<Database>, fileRelation: FileRelationUpdate, id: string): Promise<DbResult<FileRelation | null>> {
     try {
         const { data, error } = await supabase
             .from(FILE_RELATION_TABLE)
@@ -61,8 +59,7 @@ export async function updateFileRelation(fileRelation: FileRelationUpdate, id: s
     }
 }
 
-export async function getFileRelationByRelatedRecord(relatedTable: FileRelatedTable, relatedRecordId: string): Promise<DbResult<FileRelation | null>> {
-    const supabase = createClient()
+export async function getFileRelationByRelatedRecord(supabase: SupabaseClient<Database>, relatedTable: FileRelatedTable, relatedRecordId: string): Promise<DbResult<FileRelation | null>> {
     try {
         const { data, error } = await supabase
             .from(FILE_RELATION_TABLE)
@@ -81,8 +78,7 @@ export async function getFileRelationByRelatedRecord(relatedTable: FileRelatedTa
     }
 }
 
-export async function getFileRelationByRelatedFile(relatedFileId: string): Promise<DbResult<FileRelation | null>> {
-    const supabase = createClient()
+export async function getFileRelationByRelatedFile(supabase: SupabaseClient<Database>, relatedFileId: string): Promise<DbResult<FileRelation | null>> {
     try {
         const { data, error } = await supabase
             .from(FILE_RELATION_TABLE)

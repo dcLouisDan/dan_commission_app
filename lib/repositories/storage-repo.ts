@@ -1,8 +1,8 @@
-import { createClient } from "../supabase/server";
+import { createClient } from "../supabase/client";
 import { DbResult, StorageData, StorageSummary } from "../types/response";
 
 export async function uploadFile(file: File, bucket: string, folderName?: string): Promise<DbResult<StorageData>> {
-    const supabase = await createClient();
+    const supabase = createClient();
     try {
         const fileName = folderName ? `${folderName}/${file.name}` : file.name;
         const { data, error } = await supabase.storage
@@ -22,7 +22,7 @@ export async function uploadFile(file: File, bucket: string, folderName?: string
 }
 
 export async function deleteFiles(paths: string[], bucket: string): Promise<DbResult<void>> {
-    const supabase = await createClient();
+    const supabase = createClient();
     try {
         const { error } = await supabase.storage
             .from(bucket)

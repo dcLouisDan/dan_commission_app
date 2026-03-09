@@ -10,6 +10,16 @@ export const imageSchema = z.instanceof(File, {
     message: "Reference image type must be one of the allowed types",
 })
 
+export const uploadedImageSchema = z.object({
+    id: z.string(),
+    publicUrl: z.string().optional(),
+    filename: z.string(),
+    size_bytes: z.number().nullable(),
+    storage_path: z.string(),
+})
+
+export type UploadedImage = z.infer<typeof uploadedImageSchema>
+
 
 export const formSchema = z.object({
     // Identity and Contant
@@ -51,7 +61,7 @@ export const formSchema = z.object({
     image_submit_option: z.enum(IMAGE_SUBMIT_OPTIONS).default("direct_upload"),
     google_drive_folder: z.preprocess((val) => (val === "" ? undefined : val), z.url("Invalid google drive folder url").optional()),
     image_links: z.preprocess((val) => (Array.isArray(val) ? val.filter((link) => link.trim().length > 0) : val), z.array(z.url("Invalid image link")).optional()),
-    direct_upload_images: z.array(imageSchema).optional(),
+    direct_upload_images: z.array(uploadedImageSchema).optional(),
     // TOS
     tos_agreed: z.boolean(),
     deposit_agreed: z.boolean(),

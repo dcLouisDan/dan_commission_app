@@ -1,16 +1,16 @@
 import { STORAGE_BUCKETS } from "../constants/files";
 import { deleteFiles, uploadFile as uploadFileRepo } from "../repositories/storage-repo";
-import { insertFileRecord } from "../repositories/db-file-repo";
-import { insertFileRelation } from "../repositories/file-relation-repo";
+import { saveFileRecordAction, saveFileRelationAction } from "../actions/file-actions";
 import { FileRelatedTable, FileRelationInsert } from "../types/file-relation";
-import { DbFileInsert } from "../types/db-file";
+import { DbFileInsert, FileServiceResult } from "../types/db-file";
 
-type BucketId = typeof STORAGE_BUCKETS[number]
+type BucketId = keyof typeof STORAGE_BUCKETS
 
-export async function uploadFile(file: File, bucket: BucketId, folderName: string, metadata: Record<string, string>, isPublic: boolean = false) {
+export async function uploadFile(file: File, bucket: BucketId, folderName: string, metadata: Record<string, string> = {}, isPublic: boolean = true): Promise<FileServiceResult> {
     var filePath: string | null = null
     try {
-        const result = await uploadFileRepo(file, bucket, folderName)
+        const actualBucketName = STORAGE_BUCKETS[bucket];
+        const result = await uploadFileRepo(file, actualBucketName, folderName)
         if (!result.ok) {
             return { ok: false, error: { type: "storage", message: result.error.raw.message } }
         }
@@ -26,17 +26,17 @@ export async function uploadFile(file: File, bucket: BucketId, folderName: strin
             is_public: isPublic
         }
 
-        const fileRecord = await insertFileRecord(fileRecordInsert)
+        const fileRecord = await saveFileRecordAction(fileRecordInsert)
         if (!fileRecord.ok) {
-            await deleteFiles([filePath], bucket)
-            return { ok: false, error: { type: "database", message: fileRecord.error.raw.message } }
+            await deleteFiles([filePath], actualBucketName)
+            return { ok: false, error: { type: "database", message: fileRecord.error?.message || "No data returned from database" } }
         }
 
-        return { ok: true, data: fileRecord.data }
+        return { ok: true, data: { ...fileRecord.data, publicUrl: result.data.publicUrl } }
     } catch (error) {
         const err = error as Error
         if (filePath) {
-            await deleteFiles([filePath], bucket)
+            await deleteFiles([filePath], STORAGE_BUCKETS[bucket])
         }
         return { ok: false, error: { type: "unknown", message: err.message } }
     }
@@ -50,9 +50,9 @@ export async function linkFileToRecord(fileId: string, relatedTable: FileRelated
             related_id: relatedRecordId,
             relation_type: relationType
         }
-        const fileRelation = await insertFileRelation(fileRelationInsert)
+        const fileRelation = await saveFileRelationAction(fileRelationInsert)
         if (!fileRelation.ok) {
-            return { ok: false, error: { type: "database", message: fileRelation.error.raw.message } }
+            return { ok: false, error: { type: "database", message: fileRelation.error.message } }
         }
         return { ok: true, data: fileRelation.data }
     } catch (error) {

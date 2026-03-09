@@ -1,8 +1,8 @@
+import { COMMISSIONS_TABLE } from "../constants/files";
 import { createClient } from "../supabase/server";
 import { Commission, CommissionInsert } from "../types/commission";
 import { DbResult } from "../types/response";
 
-export const COMMISSIONS_TABLE = "commissions"
 
 export async function insertCommission(data: CommissionInsert): Promise<DbResult<Commission | null>> {
     const supabase = await createClient()

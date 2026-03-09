@@ -1,4 +1,4 @@
-
+"use client"
 import { Controller } from "react-hook-form"
 import {
     Field,
@@ -17,7 +17,7 @@ import { IMAGE_SUBMIT_OPTIONS } from "@/lib/constants/commision-form";
 import { FormInput, FormOutput } from "@/lib/validations/commission";
 import { FIELD_PLACEHOLDERS } from "@/lib/constants/commision-form";
 import { useFormContext } from "react-hook-form";
-import MultiImageInput from "@/components/multi-image-input";
+import MultiImageUploadInput from "@/components/multi-image-upload-input";
 
 export const REFERENCE_IMAGES_FIELDS: (keyof FormInput)[] = [
     "image_submit_option",
@@ -62,7 +62,7 @@ export default function ReferenceImagesSection() {
                             <Field className="border bg-card p-4 rounded-md">
                                 <FieldLabel><Image className="inline w-4 h-4" /> Upload Reference Images</FieldLabel>
                                 <FieldDescription>{FIELD_PLACEHOLDERS.direct_upload_images}</FieldDescription>
-                                <MultiImageInput images={field.value ?? []} setImages={field.onChange} />
+                                <MultiImageUploadInput images={field.value ?? []} setImages={field.onChange} />
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

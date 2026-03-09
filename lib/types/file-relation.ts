@@ -7,4 +7,4 @@ export type FileRelationInsert = Database['public']['Tables']['file_relations'][
 
 export type FileRelationUpdate = Database['public']['Tables']['file_relations']['Update'];
 
-export type FileRelatedTable = typeof FILE_RELATED_TABLES[number];
+export type FileRelatedTable = keyof typeof FILE_RELATED_TABLES;

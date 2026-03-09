@@ -1,11 +1,11 @@
-import { createClient } from "../supabase/client";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "../types/supabase";
 import { DbFileInsert, DbFile, DbFileUpdate } from "../types/db-file";
 import { DbResult } from "../types/response";
 
 export const DB_FILE_TABLE = 'files';
 
-export async function insertFileRecord(file: DbFileInsert): Promise<DbResult<DbFile | null>> {
-    const supabase = createClient()
+export async function insertFileRecord(supabase: SupabaseClient<Database>, file: DbFileInsert): Promise<DbResult<DbFile>> {
 
     try {
         const { data, error } = await supabase
@@ -24,8 +24,7 @@ export async function insertFileRecord(file: DbFileInsert): Promise<DbResult<DbF
     }
 }
 
-export async function updateFileRecord(file: DbFileUpdate, id: string): Promise<DbResult<DbFile | null>> {
-    const supabase = createClient()
+export async function updateFileRecord(supabase: SupabaseClient<Database>, file: DbFileUpdate, id: string): Promise<DbResult<DbFile>> {
     try {
         const { data, error } = await supabase
             .from(DB_FILE_TABLE)
@@ -44,8 +43,7 @@ export async function updateFileRecord(file: DbFileUpdate, id: string): Promise<
     }
 }
 
-export async function deleteFileRecord(id: string): Promise<DbResult<null>> {
-    const supabase = createClient()
+export async function deleteFileRecord(supabase: SupabaseClient<Database>, id: string): Promise<DbResult<null>> {
     try {
         const { error } = await supabase
             .from(DB_FILE_TABLE)

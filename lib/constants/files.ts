@@ -1,14 +1,17 @@
-import { COMMISSIONS_TABLE } from "../repositories/commission-repo";
-import { FILE_RELATION_TABLE } from "../repositories/file-relation-repo";
-import { COMMISSION_REFERENCE_IMAGES_BUCKET } from "../services/commission-service";
-import { ADMIN_IMAGES_BUCKET } from "../services/commission-tier-service";
 
-export const FILE_RELATED_TABLES = [
+export const COMMISSIONS_TABLE = "commissions"
+export const COMMISSION_REFERENCE_IMAGES_BUCKET = process.env.NEXT_COMMISSION_REFERENCE_BUCKET ?? "commission_reference_images";
+export const ADMIN_IMAGES_BUCKET = process.env.NEXT_ADMIN_IMAGES_BUCKET ?? "admin_images";
+export const FILE_RELATION_TABLE = 'file_relations';
+export const FILE_RELATED_TABLES = {
     COMMISSIONS_TABLE,
     FILE_RELATION_TABLE,
-] as const;
+} as const;
 
-export const STORAGE_BUCKETS = [
+export const STORAGE_BUCKETS = {
     ADMIN_IMAGES_BUCKET,
     COMMISSION_REFERENCE_IMAGES_BUCKET
-] as const;
+} as const;
+
+export const TEMP_UPLOAD_FOLDER = "temp";
+export const APPROVED_UPLOAD_FOLDER = "approved";
