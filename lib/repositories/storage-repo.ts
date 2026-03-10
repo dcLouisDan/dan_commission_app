@@ -56,3 +56,19 @@ function summarize(data: DbResult<StorageData>[]): StorageSummary {
     const success_public_urls = data.filter(item => item.ok).map(item => item.data?.publicUrl).filter(url => url !== undefined) || [];
     return { success_count, failed_count, total_count, failed_files, success_files, success_public_urls };
 }
+
+import { SupabaseClient } from "@supabase/supabase-js";
+export async function moveFile(supabase: SupabaseClient, bucket: string, fromPath: string, toPath: string): Promise<DbResult<void>> {
+    try {
+        const { error } = await supabase.storage
+            .from(bucket)
+            .move(fromPath, toPath);
+
+        if (error) {
+            return { ok: false, error: { type: "storage", raw: error } };
+        }
+        return { ok: true, data: undefined };
+    } catch (error) {
+        return { ok: false, error: { type: "storage", raw: error as Error } };
+    }
+}

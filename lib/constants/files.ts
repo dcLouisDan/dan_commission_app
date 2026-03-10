@@ -14,4 +14,5 @@ export const STORAGE_BUCKETS = {
 } as const;
 
 export const TEMP_UPLOAD_FOLDER = "temp";
+export const SUBMITTED_UPLOAD_FOLDER = "submitted";
 export const APPROVED_UPLOAD_FOLDER = "approved";

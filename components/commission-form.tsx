@@ -99,7 +99,8 @@ export default function CommissionForm() {
                 return <CustomerInfoSection />
         }
     }
-    console.log(form.formState.errors)
+
+
 
     return (
         <FormProvider {...form}>

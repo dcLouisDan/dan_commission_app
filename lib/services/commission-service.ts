@@ -1,11 +1,12 @@
-import { COMMISSION_REFERENCE_IMAGES_BUCKET } from "../constants/files";
+import { COMMISSION_REFERENCE_IMAGES_BUCKET, SUBMITTED_UPLOAD_FOLDER, TEMP_UPLOAD_FOLDER } from "../constants/files";
 import { insertCommission } from "../repositories/commission-repo";
-import { deleteFiles, uploadMultipleFiles } from "../repositories/storage-repo";
+import { moveFile } from "../repositories/storage-repo";
+import { insertFileRelation } from "../repositories/file-relation-repo";
+import { updateFileRecord } from "../repositories/db-file-repo";
+import { createClient } from "../supabase/server";
 import { Commission, CommissionInsert } from "../types/commission";
-import { ServiceResult, StorageSummary } from "../types/response";
-import { formatClientName } from "../utils/string-utils";
+import { ServiceResult } from "../types/response";
 import { FormOutput } from "../validations/commission";
-
 
 export async function createCommission(formData: FormOutput): Promise<ServiceResult<Commission>> {
     const { commission_type,
@@ -47,19 +48,12 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     }
 
     let referenceImages: string[] = []
-    let uploadedImages: string[] = []
+
     if (image_submit_option === "google_drive_folder" && google_drive_folder) {
         referenceImages.push(google_drive_folder)
     } else if (image_submit_option === "direct_upload" && direct_upload_images) {
-        // const timestamp = Date.now();
-        // const formattedClientName = formatClientName(client_name)
-        // const folderName = `${timestamp}_${formattedClientName}`
-        // const result = await uploadReferenceImages(direct_upload_images, folderName)
-        // if (!result.ok) {
-        //     return { ok: false, error: { type: "storage", message: result.error.message } }
-        // }
-        // uploadedImages = result.data!.success_files
-        // referenceImages = result.data!.success_public_urls || []
+        // Collect the public URLs of the already-uploaded images to save in the JSON column
+        referenceImages = direct_upload_images.map(img => img.publicUrl).filter((url): url is string => url !== undefined)
     } else if (image_submit_option === "image_links" && image_links) {
         referenceImages = image_links
     }
@@ -113,29 +107,54 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
     try {
         const result = await insertCommission(commissionInsert)
         if (!result.ok) {
-            if (uploadedImages.length > 0) {
-                await deleteFiles(uploadedImages, COMMISSION_REFERENCE_IMAGES_BUCKET)
+            return { ok: false, error: { type: "database", message: result.error.raw.message ?? "Insert failed" } }
+        }
+        if (!result.data) {
+            return { ok: false, error: { type: "database", message: "Insert succeeded but no data returned" } }
+        }
+
+        const commission = result.data;
+
+        // Post-insert: Handle direct upload files (move out of temp, update DB, create relation)
+        if (image_submit_option === "direct_upload" && direct_upload_images && direct_upload_images.length > 0) {
+            const supabase = await createClient();
+
+            for (const image of direct_upload_images) {
+                try {
+                    // 1. Move the file in storage from temp/ to submitted/{commission_id}/
+                    const newPath = `${SUBMITTED_UPLOAD_FOLDER}/${commission.id}/${image.filename}`;
+                    // The DB storage_path includes the bucket prefix, but the move API expects paths relative to the bucket.
+                    // We must strip the bucket name + slash (e.g., "commission_reference_images/") from the beginning.
+                    const bucketPrefix = `${COMMISSION_REFERENCE_IMAGES_BUCKET}/`;
+                    const relativeOldPath = image.storage_path.startsWith(bucketPrefix)
+                        ? image.storage_path.slice(bucketPrefix.length)
+                        : image.storage_path;
+
+                    const moveResult = await moveFile(supabase, COMMISSION_REFERENCE_IMAGES_BUCKET, relativeOldPath, newPath);
+
+                    if (moveResult.ok) {
+                        // 2. Update the files table with the new storage path
+                        const newFullPath = `${COMMISSION_REFERENCE_IMAGES_BUCKET}/${newPath}`;
+                        await updateFileRecord(supabase, { storage_path: newFullPath }, image.id);
+                    } else {
+                        console.error(`Failed to move file ${image.filename} in storage:`, moveResult.error);
+                        // We intentionally don't throw - the commission is valid, just the file housekeeping failed
+                    }
+
+                    // 3. Create the file relation linking the file to the commission
+                    await insertFileRelation(supabase, {
+                        file_id: image.id,
+                        related_table: "commissions",
+                        related_id: commission.id,
+                        relation_type: "reference_image"
+                    });
+                } catch (e) {
+                    console.error(`Error processing post-insert for file ${image.filename}:`, e);
+                }
             }
+        }
 
-            return { ok: false, error: { type: "database", message: result.error.raw.message } }
-        }
-        return { ok: true, data: result.data! }
-    } catch (error) {
-        const err = error as Error
-        if (uploadedImages.length > 0) {
-            await deleteFiles(uploadedImages, COMMISSION_REFERENCE_IMAGES_BUCKET)
-        }
-        return { ok: false, error: { type: "unknown", message: err.message } }
-    }
-}
-
-async function uploadReferenceImages(files: File[], folderName: string): Promise<ServiceResult<StorageSummary>> {
-    try {
-        const result = await uploadMultipleFiles(files, COMMISSION_REFERENCE_IMAGES_BUCKET, folderName)
-        if (!result.ok) {
-            return { ok: false, error: { type: "storage", message: result.error.raw.message } }
-        }
-        return { ok: true, data: result.data! }
+        return { ok: true, data: commission }
     } catch (error) {
         const err = error as Error
         return { ok: false, error: { type: "unknown", message: err.message } }

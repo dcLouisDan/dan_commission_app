@@ -65,7 +65,8 @@ export async function getFileRelationByRelatedRecord(supabase: SupabaseClient<Da
             .from(FILE_RELATION_TABLE)
             .select("*")
             .eq("related_table", relatedTable)
-            .eq("related_record_id", relatedRecordId)
+            .eq("related_id", relatedRecordId)
+
             .single();
 
         if (error) {
