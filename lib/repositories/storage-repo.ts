@@ -1,10 +1,11 @@
 import { createClient } from "../supabase/client";
 import { DbResult, StorageData, StorageSummary } from "../types/response";
 
-export async function uploadFile(file: File, bucket: string, folderName?: string): Promise<DbResult<StorageData>> {
+export async function uploadFile(file: File, bucket: string, folderName?: string, customFileName?: string): Promise<DbResult<StorageData>> {
     const supabase = createClient();
     try {
-        const fileName = folderName ? `${folderName}/${file.name}` : file.name;
+        const finalName = customFileName || file.name;
+        const fileName = folderName ? `${folderName}/${finalName}` : finalName;
         const { data, error } = await supabase.storage
             .from(bucket)
             .upload(fileName, file);
@@ -58,7 +59,7 @@ function summarize(data: DbResult<StorageData>[]): StorageSummary {
 }
 
 import { SupabaseClient } from "@supabase/supabase-js";
-export async function moveFile(supabase: SupabaseClient, bucket: string, fromPath: string, toPath: string): Promise<DbResult<void>> {
+export async function moveFile(supabase: SupabaseClient, bucket: string, fromPath: string, toPath: string): Promise<DbResult<{ publicUrl: string }>> {
     try {
         const { error } = await supabase.storage
             .from(bucket)
@@ -67,7 +68,8 @@ export async function moveFile(supabase: SupabaseClient, bucket: string, fromPat
         if (error) {
             return { ok: false, error: { type: "storage", raw: error } };
         }
-        return { ok: true, data: undefined };
+        const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(toPath);
+        return { ok: true, data: { publicUrl: publicUrlData.publicUrl } };
     } catch (error) {
         return { ok: false, error: { type: "storage", raw: error as Error } };
     }

@@ -71,7 +71,8 @@ export default function CommissionTierForm({ intent = "create", commissionTier }
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field className="h-full">
-                                <BasicImageInput image={field.value} setImage={field.onChange} defaultPreviewSrc={commissionTier?.thumbnail_url} />
+                                <BasicImageInput image={field.value ?? null} setImage={field.onChange} defaultPreviewSrc={commissionTier?.thumbnail_url} />
+
                                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}

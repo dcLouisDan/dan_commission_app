@@ -11,3 +11,9 @@ export async function createCommissionTierAction(tier: FormOutput) {
 export async function editCommissionTierAction(tier: FormOutput, commissionTier: CommissionTier) {
     return await editCommissionTier(tier, commissionTier)
 }
+
+import { getCommissionTiers } from "@/lib/repositories/commission-tier-repo"
+
+export async function getCommissionTiersAction() {
+    return await getCommissionTiers()
+}

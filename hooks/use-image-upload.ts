@@ -18,16 +18,21 @@ export function useImageUpload(bucket: BucketId) {
     ): Promise<UploadedImage[]> => {
         const results = await Promise.allSettled(
             acceptedFiles.map(async (file): Promise<UploadedImage> => {
-                const fileName = file.name;
+                const timestamp = Date.now();
+                const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const fileName = `${timestamp}_${safeName}`;
+
                 setLoadingMap((prev) => ({ ...prev, [fileName]: true }));
 
                 try {
                     // Step 1: Upload file bytes directly from the browser to Supabase Storage.
                     // This bypasses the Next.js Server Action body size limit entirely.
+                    // We pass `fileName` to customize the upload path so Supabase doesn't get confused by identical names.
                     const storageResult = await uploadFileToStorage(
                         file,
                         actualBucketName,
-                        TEMP_UPLOAD_FOLDER
+                        TEMP_UPLOAD_FOLDER,
+                        fileName
                     );
                     if (!storageResult.ok) {
                         throw new Error(storageResult.error.raw.message);
@@ -37,8 +42,8 @@ export function useImageUpload(bucket: BucketId) {
                     // Only tiny JSON is sent through the server boundary — no size concern.
                     const fileRecord = await saveFileRecordAction({
                         bucket_id: actualBucketName,
-                        filename: file.name,
-                        storage_path: storageResult.data.fullPath,
+                        filename: fileName,
+                        storage_path: storageResult.data.path,
                         size_bytes: file.size,
                         content_type: file.type,
                         metadata: {},
@@ -48,7 +53,7 @@ export function useImageUpload(bucket: BucketId) {
                     if (!fileRecord.ok) {
                         // Roll back: remove the orphaned file from storage
                         await deleteFiles(
-                            [storageResult.data.fullPath],
+                            [storageResult.data.path],
                             actualBucketName
                         );
                         throw new Error(

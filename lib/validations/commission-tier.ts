@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { imageSchema } from "./commission";
+import { uploadedImageSchema } from "./commission";
 
 export const formSchema = z.object({
     category: z.string().min(1),
@@ -8,7 +8,7 @@ export const formSchema = z.object({
     price_php: z.coerce.number<string>(),
     price_usd: z.coerce.number<string>(),
     slot_limit: z.coerce.number<string>(),
-    thumbnail: imageSchema,
+    thumbnail: uploadedImageSchema.optional(),
     variant: z.string().min(1),
 })
 

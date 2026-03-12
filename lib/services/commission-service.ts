@@ -117,27 +117,22 @@ export async function createCommission(formData: FormOutput): Promise<ServiceRes
 
         // Post-insert: Handle direct upload files (move out of temp, update DB, create relation)
         if (image_submit_option === "direct_upload" && direct_upload_images && direct_upload_images.length > 0) {
+            console.log(`[COMMISSION CREATION] Processing ${direct_upload_images.length} direct upload images for commission ${commission.id}`);
             const supabase = await createClient();
 
             for (const image of direct_upload_images) {
                 try {
                     // 1. Move the file in storage from temp/ to submitted/{commission_id}/
                     const newPath = `${SUBMITTED_UPLOAD_FOLDER}/${commission.id}/${image.filename}`;
-                    // The DB storage_path includes the bucket prefix, but the move API expects paths relative to the bucket.
-                    // We must strip the bucket name + slash (e.g., "commission_reference_images/") from the beginning.
-                    const bucketPrefix = `${COMMISSION_REFERENCE_IMAGES_BUCKET}/`;
-                    const relativeOldPath = image.storage_path.startsWith(bucketPrefix)
-                        ? image.storage_path.slice(bucketPrefix.length)
-                        : image.storage_path;
-
-                    const moveResult = await moveFile(supabase, COMMISSION_REFERENCE_IMAGES_BUCKET, relativeOldPath, newPath);
+                    console.log(`[COMMISSION CREATION] Moving file from ${image.storage_path} to ${newPath}`);
+                    const moveResult = await moveFile(supabase, COMMISSION_REFERENCE_IMAGES_BUCKET, image.storage_path, newPath);
 
                     if (moveResult.ok) {
+                        console.log(`[COMMISSION CREATION] Successfully moved file`);
                         // 2. Update the files table with the new storage path
-                        const newFullPath = `${COMMISSION_REFERENCE_IMAGES_BUCKET}/${newPath}`;
-                        await updateFileRecord(supabase, { storage_path: newFullPath }, image.id);
+                        await updateFileRecord(supabase, { storage_path: newPath }, image.id);
                     } else {
-                        console.error(`Failed to move file ${image.filename} in storage:`, moveResult.error);
+                        console.error(`[COMMISSION CREATION] Failed to move file ${image.filename} in storage:`, moveResult.error);
                         // We intentionally don't throw - the commission is valid, just the file housekeeping failed
                     }
 
