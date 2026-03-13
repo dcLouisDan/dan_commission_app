@@ -1,7 +1,6 @@
 import CommissionForm from "@/components/commission-form";
 import { TypographyH1 } from "@/components/typography";
 import { Separator } from "@/components/ui/separator";
-import { useServerLocation } from "@/hooks/use-server-location";
 import { Suspense } from "react";
 
 export default async function NewCommissionPage() {

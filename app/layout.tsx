@@ -4,6 +4,7 @@ import "./globals.css";
 import { APP_NAME, APP_HERO_TAGLINE } from "@/lib/constants/app";
 import { FONTS } from "@/lib/constants/fonts";
 import { Toaster } from "@/components/ui/sonner";
+import Providers from "./providers";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -30,8 +31,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <Providers>
+            {children}
+            <Toaster />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

@@ -14,7 +14,7 @@ export default function NewCommissionTierPage() {
             <div className="flex items-center justify-between">
                 <TypographyH2>New Commission Tier</TypographyH2>
             </div>
-            <CommissionTierForm />
+            <CommissionTierForm intent="create" />
         </div>
     )
 }
